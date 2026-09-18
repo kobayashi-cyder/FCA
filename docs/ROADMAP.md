@@ -35,7 +35,7 @@ Status: initial implementation.
 Status: manifest/import boundary implemented; real dataset ingestion next.
 
 - define a versioned wiring manifest — implemented;
-- ingest explicit neuron/edge tables;
+- ingest normalized neuron/edge tables — generic PN→KC CSV converter implemented;
 - preserve neuron classes and compartment metadata where available;
 - compare synthetic sparse wiring against data-backed wiring;
 - benchmark behavior, latency and memory;

@@ -6,6 +6,7 @@ from .canary import CanaryObservation, StagedCanary
 from .capability import CapabilityPriorityEngine, GapEvidence, GapKind
 from .concepts import ConceptGraph, Fact
 from .hypothesis import Hypothesis, HypothesisCompetition, HypothesisEngine
+from .importers import edge_csv_to_manifest
 from .improvement import CandidateLifecycle, CandidateState, Evidence, FailureMemory, FailureRecord
 from .memory import HotColdMemory, MemoryItem
 from .organs import OrganRegistry, OrganResult
@@ -26,6 +27,7 @@ __all__ = [
     "Hypothesis",
     "HypothesisCompetition",
     "HypothesisEngine",
+    "edge_csv_to_manifest",
     "AutonomousLoop",
     "GoalReport",
     "Step",

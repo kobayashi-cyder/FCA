@@ -22,6 +22,7 @@ class ConnectomeManifest:
     source_name: str
     source_sha256: str
     input_channels: int
+    input_labels: tuple[str, ...]
     units: tuple[WiringUnit, ...]
     manifest_sha256: str
 
@@ -40,6 +41,15 @@ class ConnectomeManifest:
         source_sha = str(source.get("sha256", "")).lower().strip()
         channels = int(raw.get("input_channels", 0))
         rows = raw.get("units")
+        labels_raw = raw.get("input_labels")
+        if labels_raw is None:
+            input_labels = tuple(str(i) for i in range(channels))
+        elif isinstance(labels_raw, list) and len(labels_raw) == channels:
+            input_labels = tuple(str(x) for x in labels_raw)
+            if len(set(input_labels)) != len(input_labels):
+                raise ValueError("input_labels must be unique")
+        else:
+            raise ValueError("input_labels must match input_channels")
 
         if not version or not source_name or channels < 1 or not isinstance(rows, list) or not rows:
             raise ValueError("manifest is missing required fields")
@@ -70,6 +80,7 @@ class ConnectomeManifest:
             source_name=source_name,
             source_sha256=source_sha,
             input_channels=channels,
+            input_labels=input_labels,
             units=tuple(units),
             manifest_sha256=digest,
         )
