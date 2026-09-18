@@ -21,12 +21,12 @@ Status: initial implementation.
 - no one-prompt/one-answer assumption.
 
 ## FCA-2 — Memory and organ economics
-Next.
+Status: initial implementation.
 
-- hot/cold episodic memory;
-- semantic concept graph;
-- activation cost per organ;
-- value-of-information scheduling;
+- hot/cold episodic memory — implemented;
+- semantic concept graph — next;
+- activation cost per organ — implemented;
+- value-of-information scheduling — implemented;
 - branch pruning and timeouts;
 - contradiction retention.
 
