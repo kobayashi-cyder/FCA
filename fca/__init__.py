@@ -2,17 +2,25 @@
 
 from .agent import FCAAgent, Decision
 from .autonomy import AutonomousLoop, GoalReport, Step
+from .canary import CanaryObservation, StagedCanary
+from .capability import CapabilityPriorityEngine, GapEvidence, GapKind
 from .concepts import ConceptGraph, Fact
 from .hypothesis import Hypothesis, HypothesisCompetition, HypothesisEngine
 from .improvement import CandidateLifecycle, CandidateState, Evidence, FailureMemory, FailureRecord
 from .memory import HotColdMemory, MemoryItem
 from .organs import OrganRegistry, OrganResult
+from .provenance import ProvenanceChain, ProvenanceEvent
 from .scheduler import OrganBid, ValueScheduler
 from .wiring_manifest import ConnectomeManifest, WiringUnit
 
 __all__ = [
     "FCAAgent",
     "Decision",
+    "CanaryObservation",
+    "StagedCanary",
+    "CapabilityPriorityEngine",
+    "GapEvidence",
+    "GapKind",
     "ConceptGraph",
     "Fact",
     "Hypothesis",
@@ -23,6 +31,8 @@ __all__ = [
     "Step",
     "OrganRegistry",
     "OrganResult",
+    "ProvenanceChain",
+    "ProvenanceEvent",
     "CandidateLifecycle",
     "CandidateState",
     "Evidence",

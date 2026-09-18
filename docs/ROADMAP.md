@@ -53,13 +53,15 @@ Status: manifest/import boundary implemented; real dataset ingestion next.
 FAP V69–V77 boundaries should be reused where they remain valid.
 
 ## FCA-5 — Verified structural self-improvement
-- Failure Memory;
-- capability-gap clustering;
+Status: control-plane skeleton implemented; sandbox/holdout integration next.
+
+- Failure Memory — implemented;
+- capability-gap clustering/prioritization — implemented;
 - candidate generation;
 - sandbox/resource/holdout gates;
-- ephemeral -> shadow -> staged canary -> consolidated;
-- rollback and quarantine;
-- provenance chain.
+- ephemeral -> shadow -> staged canary -> consolidated — skeleton implemented;
+- rollback and quarantine — lifecycle/canary triggers implemented;
+- provenance chain — implemented.
 
 ## FCA-6 — Distillation into circuit priors
 - distill repeated provider/teacher behavior into compact local rules;
