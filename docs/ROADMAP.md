@@ -24,11 +24,12 @@ Status: initial implementation.
 Status: initial implementation.
 
 - hot/cold episodic memory — implemented;
-- semantic concept graph — next;
+- semantic concept graph — implemented;
 - activation cost per organ — implemented;
 - value-of-information scheduling — implemented;
 - branch pruning and timeouts;
-- contradiction retention.
+- contradiction retention — implemented;
+- hypothesis generation/competition — implemented.
 
 ## FCA-3 — Data-backed connectome wiring
 Next major biological step.
