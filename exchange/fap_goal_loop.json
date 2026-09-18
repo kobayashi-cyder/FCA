@@ -1,0 +1,36 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "eb75aad4be2d35cb376fb6750f772c00727934e4",
+  "capability": "bounded_goal_completion",
+  "mechanism": {
+    "pattern": "plan_execute_critic_replan",
+    "hard_stops": [
+      "completed",
+      "blocked",
+      "failed",
+      "stalled",
+      "exhausted",
+      "paused"
+    ],
+    "requirements": [
+      "explicit_success_criteria",
+      "bounded_steps",
+      "bounded_replans",
+      "checkpointable_state"
+    ]
+  },
+  "evidence": {
+    "status": "verified_on_fap_main",
+    "python": [
+      "3.11",
+      "3.12"
+    ],
+    "note": "Provider-neutral goal loop and structured runtime wiring."
+  },
+  "constraints": [
+    "Do not claim completion without criterion evidence.",
+    "Do not run indefinitely; preserve explicit hard stops.",
+    "External or irreversible actions may require approval."
+  ]
+}
