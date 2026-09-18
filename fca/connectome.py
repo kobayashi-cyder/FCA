@@ -65,12 +65,12 @@ class KenyonLayer:
         seed: str = "FCA",
         wiring: Sequence[Sequence[int]] | None = None,
     ) -> None:
-        if not (1 <= fan_in <= input_channels):
-            raise ValueError("fan_in out of range")
         self.input_channels = input_channels
         self.fan_in = fan_in
         self.seed = seed
         if wiring is None:
+            if not (1 <= fan_in <= input_channels):
+                raise ValueError("fan_in out of range")
             self.kcs = kcs
             self._wiring = tuple(self._fan_in_for(kc) for kc in range(kcs))
         else:

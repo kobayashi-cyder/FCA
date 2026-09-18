@@ -8,6 +8,7 @@ from .improvement import CandidateLifecycle, CandidateState, Evidence, FailureMe
 from .memory import HotColdMemory, MemoryItem
 from .organs import OrganRegistry, OrganResult
 from .scheduler import OrganBid, ValueScheduler
+from .wiring_manifest import ConnectomeManifest, WiringUnit
 
 __all__ = [
     "FCAAgent",
@@ -31,4 +32,6 @@ __all__ = [
     "MemoryItem",
     "OrganBid",
     "ValueScheduler",
+    "ConnectomeManifest",
+    "WiringUnit",
 ]

@@ -1,0 +1,31 @@
+{
+  "schema": "fca.connectome.v1",
+  "version": "synthetic-fixture-1",
+  "source": {
+    "name": "synthetic-test-fixture",
+    "sha256": ""
+  },
+  "input_channels": 8,
+  "units": [
+    {
+      "id": "kc0",
+      "class": "KC",
+      "inputs": [0, 1, 2]
+    },
+    {
+      "id": "kc1",
+      "class": "KC",
+      "inputs": [2, 3, 4]
+    },
+    {
+      "id": "kc2",
+      "class": "KC",
+      "inputs": [4, 5, 6]
+    },
+    {
+      "id": "kc3",
+      "class": "KC",
+      "inputs": [6, 7, 0]
+    }
+  ]
+}

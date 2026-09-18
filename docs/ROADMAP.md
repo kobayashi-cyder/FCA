@@ -32,9 +32,9 @@ Status: initial implementation.
 - hypothesis generation/competition — implemented.
 
 ## FCA-3 — Data-backed connectome wiring
-Next major biological step.
+Status: manifest/import boundary implemented; real dataset ingestion next.
 
-- define a versioned wiring manifest;
+- define a versioned wiring manifest — implemented;
 - ingest explicit neuron/edge tables;
 - preserve neuron classes and compartment metadata where available;
 - compare synthetic sparse wiring against data-backed wiring;
