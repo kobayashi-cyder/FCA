@@ -52,7 +52,8 @@ class SensoryHash:
 class KenyonLayer:
     """Sparse expansion + global competition, inspired by mushroom-body KC coding.
 
-    The fixed hash-derived fan-in approximates a compact connectome-like wiring table.
+    The default fixed hash-derived fan-in is a compact bootstrap wiring table.
+    Explicit wiring may be injected for data-backed connectome experiments.
     """
 
     def __init__(
@@ -62,17 +63,30 @@ class KenyonLayer:
         fan_in: int = 6,
         winners: int = 16,
         seed: str = "FCA",
+        wiring: Sequence[Sequence[int]] | None = None,
     ) -> None:
-        if not (1 <= winners <= kcs):
-            raise ValueError("winners must be in 1..kcs")
         if not (1 <= fan_in <= input_channels):
             raise ValueError("fan_in out of range")
         self.input_channels = input_channels
-        self.kcs = kcs
         self.fan_in = fan_in
-        self.winners = winners
         self.seed = seed
-        self._wiring = tuple(self._fan_in_for(kc) for kc in range(kcs))
+        if wiring is None:
+            self.kcs = kcs
+            self._wiring = tuple(self._fan_in_for(kc) for kc in range(kcs))
+        else:
+            checked: list[tuple[int, ...]] = []
+            for inputs in wiring:
+                row = tuple(dict.fromkeys(int(i) for i in inputs))
+                if not row or any(i < 0 or i >= input_channels for i in row):
+                    raise ValueError("invalid explicit wiring")
+                checked.append(row)
+            if not checked:
+                raise ValueError("wiring must contain at least one KC")
+            self.kcs = len(checked)
+            self._wiring = tuple(checked)
+        if not (1 <= winners <= self.kcs):
+            raise ValueError("winners must be in 1..kcs")
+        self.winners = winners
 
     def _fan_in_for(self, kc: int) -> tuple[int, ...]:
         seen: set[int] = set()
@@ -88,7 +102,7 @@ class KenyonLayer:
         trace = trace or {}
         scored: list[tuple[float, int]] = []
         for kc, inputs in enumerate(self._wiring):
-            drive = sum(sensory[i] for i in inputs) / self.fan_in
+            drive = sum(sensory[i] for i in inputs) / len(inputs)
             drive += 0.10 * trace.get(kc, 0.0)
             scored.append((tanh(drive), kc))
         scored.sort(key=lambda p: (p[0], -p[1]), reverse=True)
