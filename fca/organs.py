@@ -91,8 +91,9 @@ class OrganRegistry:
                     exc, policy.retryable_exceptions
                 )
                 if retryable and attempt < policy.max_attempts:
-                    if policy.retry_delay_seconds:
-                        self._sleeper(float(policy.retry_delay_seconds))
+                    delay = policy.delay_before_attempt(attempt)
+                    if delay:
+                        self._sleeper(delay)
                     continue
                 raise
             if not isinstance(result, OrganResult):
