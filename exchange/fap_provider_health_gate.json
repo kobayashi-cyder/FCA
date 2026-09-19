@@ -1,0 +1,26 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "a4a0a8449b1d91a3debebb33d33a6e3e5765084b",
+  "capability": "provider_health_gate",
+  "mechanism": {
+    "source_surface": "releases/v74/gated_runtime/fap_gated_runtime/gated_runtime.py",
+    "pattern": "fail_closed_after_connectome_selection",
+    "requirements": [
+      "provider_probe_before_external_capability",
+      "healthy_status",
+      "explicit_capability_declaration"
+    ]
+  },
+  "evidence": {
+    "status": "adapted_with_focused_fca_tests",
+    "fap_source": "V74 health-gated interaction runtime",
+    "fca_tests": "tests/test_provider_gate.py"
+  },
+  "constraints": [
+    "Connectome routing remains authoritative for organ selection.",
+    "The gate only blocks provider-backed execution after selection.",
+    "Local organs without a declared external capability remain ungated.",
+    "Unknown or missing provider health fails closed."
+  ]
+}

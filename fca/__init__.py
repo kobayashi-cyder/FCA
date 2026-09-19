@@ -13,6 +13,7 @@ from .importers import edge_csv_to_manifest
 from .improvement import CandidateLifecycle, CandidateState, Evidence, FailureMemory, FailureRecord
 from .memory import HotColdMemory, MemoryItem
 from .organs import OrganRegistry, OrganResult
+from .provider_gate import ProviderHealth, ProviderHealthGate
 from .provenance import ProvenanceChain, ProvenanceEvent
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
@@ -25,7 +26,7 @@ __all__ = [
     "GoalContract", "CriterionAssessment", "GoalAssessment", "GoalCritic",
     "Hypothesis", "HypothesisCompetition", "HypothesisEngine",
     "edge_csv_to_manifest", "AutonomousLoop", "GoalReport", "Step",
-    "OrganRegistry", "OrganResult", "ProvenanceChain", "ProvenanceEvent",
+    "OrganRegistry", "OrganResult", "ProviderHealth", "ProviderHealthGate", "ProvenanceChain", "ProvenanceEvent",
     "CandidateLifecycle", "CandidateState", "Evidence", "FailureMemory", "FailureRecord",
     "HotColdMemory", "MemoryItem", "OrganBid", "ValueScheduler",
     "JSONGoalCheckpointStore", "ConnectomeManifest", "WiringUnit",
