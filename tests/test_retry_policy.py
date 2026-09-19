@@ -6,97 +6,65 @@ from fca.retry_policy import OrganRetryPolicy
 
 class OrganRetryPolicyTests(unittest.TestCase):
     def test_retry_is_fail_closed_without_idempotency(self):
-        with self.assertRaises(ValueError):
-            OrganRetryPolicy(max_attempts=2)
-        with self.assertRaises(ValueError):
-            OrganRetryPolicy(max_attempts=2, idempotent=True)
-        with self.assertRaises(ValueError):
-            OrganRetryPolicy(max_attempts=4, idempotent=True, justification="read only")
-        with self.assertRaises(ValueError):
-            OrganRetryPolicy(retryable_exceptions=(TimeoutError,))
-        with self.assertRaises(ValueError):
-            OrganRetryPolicy(2, True, "read only", retryable_exceptions=(str,))
+        with self.assertRaises(ValueError): OrganRetryPolicy(max_attempts=2)
+        with self.assertRaises(ValueError): OrganRetryPolicy(max_attempts=2, idempotent=True)
+        with self.assertRaises(ValueError): OrganRetryPolicy(max_attempts=4, idempotent=True, justification="read only")
+        with self.assertRaises(ValueError): OrganRetryPolicy(retryable_exceptions=(TimeoutError,))
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retryable_exceptions=(str,))
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=-0.1)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=60.1)
+        with self.assertRaises(ValueError): OrganRetryPolicy(retry_delay_seconds=1)
 
     def test_declared_timeout_retries_when_explicitly_safe(self):
         calls = []
         def organ(goal, observation):
             calls.append(1)
-            if len(calls) == 1:
-                raise TimeoutError("temporary")
+            if len(calls) == 1: raise TimeoutError("temporary")
             return OrganResult("recovered")
         reg = OrganRegistry()
-        reg.register(
-            "read",
-            organ,
-            retry_policy=OrganRetryPolicy(
-                2, True, "read-only lookup", retryable_exceptions=(TimeoutError,)
-            ),
-        )
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(2, True, "read-only lookup", retryable_exceptions=(TimeoutError,)))
         self.assertEqual(reg.run("read", "goal", "state").observation, "recovered")
         self.assertEqual(len(calls), 2)
 
-    def test_unconfigured_organ_never_retries(self):
-        calls = []
+    def test_retry_delay_runs_only_between_retryable_attempts(self):
+        calls, delays = [], []
         def organ(goal, observation):
             calls.append(1)
-            raise TimeoutError("temporary")
-        reg = OrganRegistry()
-        reg.register("read", organ)
-        with self.assertRaises(TimeoutError):
-            reg.run("read", "goal", "state")
+            if len(calls) < 3: raise TimeoutError("temporary")
+            return OrganResult("recovered")
+        reg = OrganRegistry(sleeper=delays.append)
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=0.25))
+        self.assertEqual(reg.run("read", "goal", "state").observation, "recovered")
+        self.assertEqual(delays, [0.25, 0.25])
+
+    def test_terminal_exception_never_sleeps(self):
+        delays = []
+        def organ(goal, observation): raise ValueError("bad input")
+        reg = OrganRegistry(sleeper=delays.append)
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=1))
+        with self.assertRaises(ValueError): reg.run("read", "goal", "state")
+        self.assertEqual(delays, [])
+
+    def test_unconfigured_organ_never_retries(self):
+        calls = []
+        def organ(goal, observation): calls.append(1); raise TimeoutError("temporary")
+        reg = OrganRegistry(); reg.register("read", organ)
+        with self.assertRaises(TimeoutError): reg.run("read", "goal", "state")
         self.assertEqual(len(calls), 1)
 
     def test_undeclared_transport_exception_is_never_retried(self):
         calls = []
-        def organ(goal, observation):
-            calls.append(1)
-            raise ConnectionError("not declared retryable")
-        reg = OrganRegistry()
-        reg.register(
-            "read",
-            organ,
-            retry_policy=OrganRetryPolicy(
-                3, True, "read-only lookup", retryable_exceptions=(TimeoutError,)
-            ),
-        )
-        with self.assertRaises(ConnectionError):
-            reg.run("read", "goal", "state")
-        self.assertEqual(len(calls), 1)
-
-    def test_non_transient_exception_is_never_retried(self):
-        calls = []
-        def organ(goal, observation):
-            calls.append(1)
-            raise ValueError("bad input")
-        reg = OrganRegistry()
-        reg.register(
-            "read",
-            organ,
-            retry_policy=OrganRetryPolicy(
-                3, True, "read-only lookup", retryable_exceptions=(TimeoutError,)
-            ),
-        )
-        with self.assertRaises(ValueError):
-            reg.run("read", "goal", "state")
+        def organ(goal, observation): calls.append(1); raise ConnectionError("not declared retryable")
+        reg = OrganRegistry(); reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,)))
+        with self.assertRaises(ConnectionError): reg.run("read", "goal", "state")
         self.assertEqual(len(calls), 1)
 
     def test_blocked_result_is_terminal_not_retried(self):
         calls = []
-        def organ(goal, observation):
-            calls.append(1)
-            return OrganResult(observation, blocked=True, reason="approval_required")
-        reg = OrganRegistry()
-        reg.register(
-            "write",
-            organ,
-            retry_policy=OrganRetryPolicy(
-                3, True, "fixture", retryable_exceptions=(TimeoutError,)
-            ),
-        )
+        def organ(goal, observation): calls.append(1); return OrganResult(observation, blocked=True, reason="approval_required")
+        reg = OrganRegistry(); reg.register("write", organ, retry_policy=OrganRetryPolicy(3, True, "fixture", retryable_exceptions=(TimeoutError,), retry_delay_seconds=1))
         result = reg.run("write", "goal", "state")
-        self.assertTrue(result.blocked)
-        self.assertEqual(len(calls), 1)
+        self.assertTrue(result.blocked); self.assertEqual(len(calls), 1)
 
 
-if __name__ == "__main__":
-    unittest.main()
+if __name__ == "__main__": unittest.main()
