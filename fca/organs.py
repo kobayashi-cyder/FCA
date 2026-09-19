@@ -83,6 +83,7 @@ class OrganRegistry:
             )
 
         policy = self._retry_policies.get(name, OrganRetryPolicy())
+        elapsed_delay = 0.0
         for attempt in range(1, policy.max_attempts + 1):
             try:
                 result = organ(goal, observation)
@@ -91,9 +92,12 @@ class OrganRegistry:
                     exc, policy.retryable_exceptions
                 )
                 if retryable and attempt < policy.max_attempts:
-                    delay = policy.delay_before_attempt(attempt)
+                    delay = policy.delay_before_attempt(attempt, elapsed_delay=elapsed_delay)
+                    if policy.retry_delay_seconds and delay <= 0:
+                        raise
                     if delay:
                         self._sleeper(delay)
+                        elapsed_delay += delay
                     continue
                 raise
             if not isinstance(result, OrganResult):
