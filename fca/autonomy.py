@@ -35,8 +35,8 @@ class GoalReport:
 class AutonomousLoop:
     """Bounded persistent goal loop.
 
-    It stops only on completion, explicit blocker, or budget exhaustion.
-    With a checkpoint store it can resume after interruption while preserving
+    FAP-derived stall guards stop no-progress/repetition loops.
+    With a checkpoint store FCA can resume after interruption while preserving
     trace state and learned action values.
     """
 
@@ -46,16 +46,24 @@ class AutonomousLoop:
         *,
         max_steps: int = 32,
         blocker_limit: int = 3,
+        no_progress_limit: int = 3,
+        same_action_limit: int = 3,
+        min_progress_delta: float = 0.01,
         store: JSONGoalCheckpointStore | None = None,
     ) -> None:
-        if max_steps < 1 or blocker_limit < 1:
+        if min(max_steps, blocker_limit, no_progress_limit, same_action_limit) < 1:
             raise ValueError("budgets must be positive")
+        if min_progress_delta < 0.0:
+            raise ValueError("min_progress_delta must be non-negative")
         if not registry.names:
             raise ValueError("registry must contain at least one organ")
         self.registry = registry
         self.agent = FCAAgent(actions=registry.names)
         self.max_steps = max_steps
         self.blocker_limit = blocker_limit
+        self.no_progress_limit = no_progress_limit
+        self.same_action_limit = same_action_limit
+        self.min_progress_delta = float(min_progress_delta)
         self.store = store
 
     @staticmethod
@@ -68,6 +76,9 @@ class AutonomousLoop:
         report: GoalReport,
         observation: str,
         blocker_streak: int,
+        no_progress_streak: int,
+        last_action: str,
+        same_action_streak: int,
         next_step: int,
     ) -> None:
         if self.store is None:
@@ -81,6 +92,9 @@ class AutonomousLoop:
                 "steps": [asdict(step) for step in report.steps],
                 "observation": observation,
                 "blocker_streak": blocker_streak,
+                "no_progress_streak": no_progress_streak,
+                "last_action": last_action,
+                "same_action_streak": same_action_streak,
                 "next_step": next_step,
                 "agent": self.agent.snapshot(),
             },
@@ -90,7 +104,7 @@ class AutonomousLoop:
         self,
         goal_id: str,
         goal: str,
-    ) -> tuple[GoalReport, str, int, int] | None:
+    ) -> tuple[GoalReport, str, int, int, str, int, int] | None:
         if self.store is None:
             return None
         raw = self.store.load(goal_id)
@@ -98,26 +112,32 @@ class AutonomousLoop:
             return None
         if raw.get("goal") != goal:
             raise ValueError("stored goal does not match supplied goal")
-        if raw.get("status") in {"completed", "blocked"}:
-            report = GoalReport(
-                goal=goal,
-                status=str(raw["status"]),
-                steps=[Step(**row) for row in raw.get("steps", [])],
-                progress=float(raw.get("progress", 0.0)),
-            )
-            return report, str(raw.get("observation", "")), int(raw.get("blocker_streak", 0)), int(raw.get("next_step", 1))
-        self.agent.restore(raw.get("agent", {}))
+
         report = GoalReport(
             goal=goal,
-            status="running",
+            status=str(raw.get("status", "running")),
             steps=[Step(**row) for row in raw.get("steps", [])],
             progress=float(raw.get("progress", 0.0)),
         )
+        observation = str(raw.get("observation", ""))
+        blocker_streak = int(raw.get("blocker_streak", 0))
+        no_progress_streak = int(raw.get("no_progress_streak", 0))
+        last_action = str(raw.get("last_action", ""))
+        same_action_streak = int(raw.get("same_action_streak", 0))
+        next_step = int(raw.get("next_step", len(report.steps) + 1))
+
+        if report.status not in {"completed", "blocked", "stalled"}:
+            report.status = "running"
+            self.agent.restore(raw.get("agent", {}))
+
         return (
             report,
-            str(raw.get("observation", "")),
-            int(raw.get("blocker_streak", 0)),
-            int(raw.get("next_step", len(report.steps) + 1)),
+            observation,
+            blocker_streak,
+            no_progress_streak,
+            last_action,
+            same_action_streak,
+            next_step,
         )
 
     def run(
@@ -138,10 +158,21 @@ class AutonomousLoop:
             report = GoalReport(goal=goal, status="running")
             observation = initial_observation
             blocker_streak = 0
+            no_progress_streak = 0
+            last_action = ""
+            same_action_streak = 0
             start_step = 1
         else:
-            report, observation, blocker_streak, start_step = restored
-            if report.status in {"completed", "blocked"}:
+            (
+                report,
+                observation,
+                blocker_streak,
+                no_progress_streak,
+                last_action,
+                same_action_streak,
+                start_step,
+            ) = restored
+            if report.status in {"completed", "blocked", "stalled"}:
                 return report
 
         for index in range(start_step, self.max_steps + 1):
@@ -149,6 +180,7 @@ class AutonomousLoop:
             result: OrganResult = self.registry.run(decision.action, goal, observation)
             self.agent.reinforce(result.reward)
 
+            old_progress = report.progress
             report.progress = max(report.progress, result.progress)
             report.steps.append(
                 Step(
@@ -164,22 +196,61 @@ class AutonomousLoop:
             )
             observation = result.observation
 
+            if report.progress >= old_progress + self.min_progress_delta:
+                no_progress_streak = 0
+            else:
+                no_progress_streak += 1
+
+            if decision.action == last_action:
+                same_action_streak += 1
+            else:
+                last_action = decision.action
+                same_action_streak = 1
+
             if result.terminal:
                 report.status = "completed"
-                self._checkpoint(goal_id, report, observation, blocker_streak, index + 1)
+                self._checkpoint(
+                    goal_id, report, observation, blocker_streak, no_progress_streak,
+                    last_action, same_action_streak, index + 1,
+                )
                 return report
 
             if result.blocked:
                 blocker_streak += 1
                 if blocker_streak >= self.blocker_limit:
                     report.status = "blocked"
-                    self._checkpoint(goal_id, report, observation, blocker_streak, index + 1)
+                    self._checkpoint(
+                        goal_id, report, observation, blocker_streak, no_progress_streak,
+                        last_action, same_action_streak, index + 1,
+                    )
                     return report
             else:
                 blocker_streak = 0
 
-            self._checkpoint(goal_id, report, observation, blocker_streak, index + 1)
+            if no_progress_streak >= self.no_progress_limit:
+                report.status = "stalled"
+                self._checkpoint(
+                    goal_id, report, observation, blocker_streak, no_progress_streak,
+                    last_action, same_action_streak, index + 1,
+                )
+                return report
+
+            if same_action_streak >= self.same_action_limit and no_progress_streak > 0:
+                report.status = "stalled"
+                self._checkpoint(
+                    goal_id, report, observation, blocker_streak, no_progress_streak,
+                    last_action, same_action_streak, index + 1,
+                )
+                return report
+
+            self._checkpoint(
+                goal_id, report, observation, blocker_streak, no_progress_streak,
+                last_action, same_action_streak, index + 1,
+            )
 
         report.status = "budget_exhausted"
-        self._checkpoint(goal_id, report, observation, blocker_streak, self.max_steps + 1)
+        self._checkpoint(
+            goal_id, report, observation, blocker_streak, no_progress_streak,
+            last_action, same_action_streak, self.max_steps + 1,
+        )
         return report
