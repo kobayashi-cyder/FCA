@@ -17,6 +17,9 @@ class OrganRetryPolicyTests(unittest.TestCase):
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_backoff_multiplier=0.9)
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_backoff_multiplier=4.1)
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_backoff_multiplier=2)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", max_total_delay_seconds=-1)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", max_total_delay_seconds=121)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=1, max_total_delay_seconds=0)
 
     def test_declared_timeout_retries_when_explicitly_safe(self):
         calls = []
@@ -55,6 +58,28 @@ class OrganRetryPolicyTests(unittest.TestCase):
         policy = OrganRetryPolicy(3, True, "read-only lookup", retry_delay_seconds=40, retry_backoff_multiplier=4)
         self.assertEqual(policy.delay_before_attempt(1), 40.0)
         self.assertEqual(policy.delay_before_attempt(2), 60.0)
+
+    def test_total_delay_budget_caps_and_stops_retries(self):
+        calls, delays = [], []
+        def organ(goal, observation):
+            calls.append(1)
+            raise TimeoutError("temporary")
+        reg = OrganRegistry(sleeper=delays.append)
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=40, retry_backoff_multiplier=4, max_total_delay_seconds=50))
+        with self.assertRaises(TimeoutError): reg.run("read", "goal", "state")
+        self.assertEqual(delays, [40.0, 10.0])
+        self.assertEqual(len(calls), 3)
+
+    def test_zero_remaining_budget_prevents_another_attempt(self):
+        calls, delays = [], []
+        def organ(goal, observation):
+            calls.append(1)
+            raise TimeoutError("temporary")
+        reg = OrganRegistry(sleeper=delays.append)
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=40, retry_backoff_multiplier=4, max_total_delay_seconds=40))
+        with self.assertRaises(TimeoutError): reg.run("read", "goal", "state")
+        self.assertEqual(delays, [40.0])
+        self.assertEqual(len(calls), 2)
 
     def test_terminal_exception_never_sleeps(self):
         delays = []
