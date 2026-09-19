@@ -20,6 +20,9 @@ class OrganRetryPolicyTests(unittest.TestCase):
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", max_total_delay_seconds=-1)
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", max_total_delay_seconds=121)
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=1, max_total_delay_seconds=0)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=1, retry_jitter_ratio=-0.1)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=1, retry_jitter_ratio=0.6)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_jitter_ratio=0.1)
 
     def test_declared_timeout_retries_when_explicitly_safe(self):
         calls = []
@@ -58,6 +61,33 @@ class OrganRetryPolicyTests(unittest.TestCase):
         policy = OrganRetryPolicy(3, True, "read-only lookup", retry_delay_seconds=40, retry_backoff_multiplier=4)
         self.assertEqual(policy.delay_before_attempt(1), 40.0)
         self.assertEqual(policy.delay_before_attempt(2), 60.0)
+
+    def test_jitter_is_bounded_and_deterministic_when_injected(self):
+        policy = OrganRetryPolicy(2, True, "read-only lookup", retry_delay_seconds=10, retry_jitter_ratio=0.5)
+        self.assertEqual(policy.delay_before_attempt(1, jitter_unit=0.0), 5.0)
+        self.assertEqual(policy.delay_before_attempt(1, jitter_unit=1.0), 15.0)
+        with self.assertRaises(ValueError): policy.delay_before_attempt(1, jitter_unit=1.1)
+        calls, delays = [], []
+        jitter = iter((0.0, 1.0))
+        def organ(goal, observation):
+            calls.append(1)
+            if len(calls) < 3: raise TimeoutError("temporary")
+            return OrganResult("recovered")
+        reg = OrganRegistry(sleeper=delays.append, jitter_source=lambda: next(jitter))
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=10, retry_jitter_ratio=0.5))
+        self.assertEqual(reg.run("read", "goal", "state").observation, "recovered")
+        self.assertEqual(delays, [5.0, 15.0])
+
+    def test_jitter_never_exceeds_total_delay_budget(self):
+        calls, delays = [], []
+        def organ(goal, observation):
+            calls.append(1)
+            raise TimeoutError("temporary")
+        reg = OrganRegistry(sleeper=delays.append, jitter_source=lambda: 1.0)
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=20, retry_jitter_ratio=0.5, max_total_delay_seconds=25))
+        with self.assertRaises(TimeoutError): reg.run("read", "goal", "state")
+        self.assertEqual(delays, [25.0])
+        self.assertEqual(len(calls), 2)
 
     def test_total_delay_budget_caps_and_stops_retries(self):
         calls, delays = [], []
