@@ -1,0 +1,22 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "f0120980fbac875dfc7206b000c55c601598c41d",
+  "capability": "bounded_retry_delay",
+  "mechanism": {
+    "source_surface": "candidates/goal_completion_loop/fap_goal_loop/resilient_capability.py",
+    "pattern": "bounded_delay_between_explicitly_retryable_attempts"
+  },
+  "evidence": {
+    "status": "adapted_with_focused_fca_tests",
+    "fap_tests": "candidates/goal_completion_loop/tests/test_resilient_capability.py",
+    "fca_tests": "tests/test_retry_policy.py"
+  },
+  "constraints": [
+    "Connectome routing remains authoritative for organ selection.",
+    "Delay occurs only after a connectome-selected organ raises an explicitly allow-listed exception.",
+    "Retry still requires idempotency, justification, and a maximum of three FCA attempts.",
+    "Delay is bounded to 0..60 seconds and is invalid without multiple attempts.",
+    "Terminal and undeclared exceptions do not sleep or retry."
+  ]
+}
