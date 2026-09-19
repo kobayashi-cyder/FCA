@@ -17,6 +17,7 @@ class OrganRetryPolicy:
     idempotent: bool = False
     justification: str = ""
     retryable_exceptions: tuple[type[Exception], ...] = ()
+    retry_delay_seconds: float = 0.0
 
     def __post_init__(self) -> None:
         if not 1 <= int(self.max_attempts) <= 3:
@@ -30,6 +31,10 @@ class OrganRetryPolicy:
                 raise ValueError("retryable_exceptions must contain Exception types")
         if self.retryable_exceptions and self.max_attempts <= 1:
             raise ValueError("retryable_exceptions require max_attempts > 1")
+        if not 0.0 <= float(self.retry_delay_seconds) <= 60.0:
+            raise ValueError("retry_delay_seconds must be between 0 and 60")
+        if self.retry_delay_seconds and self.max_attempts <= 1:
+            raise ValueError("retry delay requires max_attempts > 1")
 
     @property
     def enabled(self) -> bool:
