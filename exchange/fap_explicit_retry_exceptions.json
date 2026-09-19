@@ -1,0 +1,28 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "58a23aeed59a42f28a8812d8f69a95de0133ff09",
+  "capability": "explicit_retryable_exception_contract",
+  "mechanism": {
+    "source_surface": "candidates/goal_completion_loop/fap_goal_loop/resilient_capability.py",
+    "pattern": "fail_closed_exception_allow_list_after_connectome_selection",
+    "requirements": [
+      "explicit_idempotency_declaration",
+      "non_empty_idempotency_justification",
+      "bounded_attempt_count",
+      "explicit_exception_type_allow_list"
+    ]
+  },
+  "evidence": {
+    "status": "adapted_with_focused_fca_tests",
+    "fap_tests": "candidates/goal_completion_loop/tests/test_resilient_capability.py",
+    "fca_tests": "tests/test_retry_policy.py"
+  },
+  "constraints": [
+    "Connectome routing remains authoritative for organ selection.",
+    "Retries occur only after the connectome-selected organ begins execution.",
+    "Exceptions are terminal unless their concrete type is explicitly allowed.",
+    "An exception allow-list is invalid when max_attempts is one.",
+    "Retry count remains capped at three attempts in FCA."
+  ]
+}
