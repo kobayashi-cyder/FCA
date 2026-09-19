@@ -27,7 +27,7 @@ class OrganRegistry:
     installed those organs fail closed until an independent probe marks that
     capability healthy. Connectome selection itself is unchanged. Selected
     organs may additionally opt into bounded retries, but only with an explicit
-    idempotency declaration and justification.
+    idempotency declaration, justification, and exception allow-list.
     """
 
     def __init__(self, *, health_gate: ProviderHealthGate | None = None) -> None:
@@ -79,8 +79,11 @@ class OrganRegistry:
         for attempt in range(1, policy.max_attempts + 1):
             try:
                 result = organ(goal, observation)
-            except (TimeoutError, ConnectionError):
-                if attempt < policy.max_attempts:
+            except Exception as exc:
+                retryable = bool(policy.retryable_exceptions) and isinstance(
+                    exc, policy.retryable_exceptions
+                )
+                if retryable and attempt < policy.max_attempts:
                     continue
                 raise
             if not isinstance(result, OrganResult):
