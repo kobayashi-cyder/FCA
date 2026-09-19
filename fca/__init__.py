@@ -14,6 +14,7 @@ from .memory import HotColdMemory, MemoryItem
 from .organs import OrganRegistry, OrganResult
 from .provenance import ProvenanceChain, ProvenanceEvent
 from .scheduler import OrganBid, ValueScheduler
+from .state_store import JSONGoalCheckpointStore
 from .wiring_manifest import ConnectomeManifest, WiringUnit
 
 __all__ = [
@@ -26,5 +27,5 @@ __all__ = [
     "OrganRegistry", "OrganResult", "ProvenanceChain", "ProvenanceEvent",
     "CandidateLifecycle", "CandidateState", "Evidence", "FailureMemory", "FailureRecord",
     "HotColdMemory", "MemoryItem", "OrganBid", "ValueScheduler",
-    "ConnectomeManifest", "WiringUnit",
+    "JSONGoalCheckpointStore", "ConnectomeManifest", "WiringUnit",
 ]
