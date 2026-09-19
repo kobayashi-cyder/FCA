@@ -1,0 +1,28 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "be71d02ec8635ea624f1a3577429650d0b84b195",
+  "capability": "bounded_idempotent_organ_retry",
+  "mechanism": {
+    "source_surface": "candidates/goal_completion_loop/fap_goal_loop/resilient_capability.py",
+    "pattern": "fail_closed_bounded_retry_after_connectome_selection",
+    "requirements": [
+      "explicit_idempotency_declaration",
+      "non_empty_idempotency_justification",
+      "bounded_attempt_count",
+      "transient_transport_errors_only"
+    ]
+  },
+  "evidence": {
+    "status": "adapted_with_focused_fca_tests",
+    "fap_tests": "candidates/goal_completion_loop/tests/test_resilient_capability.py",
+    "fca_tests": "tests/test_retry_policy.py"
+  },
+  "constraints": [
+    "Connectome routing remains authoritative for organ selection.",
+    "Retries occur only after the connectome-selected organ begins execution.",
+    "Unconfigured organs execute exactly once.",
+    "Blocked results and non-transient exceptions are never replayed.",
+    "Retry count is capped at three attempts in FCA."
+  ]
+}

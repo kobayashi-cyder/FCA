@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from .provider_gate import ProviderHealthGate
+from .retry_policy import OrganRetryPolicy
 
 
 @dataclass(frozen=True)
@@ -24,15 +25,25 @@ class OrganRegistry:
 
     Provider-backed organs may declare a capability. When a health gate is
     installed those organs fail closed until an independent probe marks that
-    capability healthy. Connectome selection itself is unchanged.
+    capability healthy. Connectome selection itself is unchanged. Selected
+    organs may additionally opt into bounded retries, but only with an explicit
+    idempotency declaration and justification.
     """
 
     def __init__(self, *, health_gate: ProviderHealthGate | None = None) -> None:
         self._organs: dict[str, Organ] = {}
         self._capabilities: dict[str, str] = {}
+        self._retry_policies: dict[str, OrganRetryPolicy] = {}
         self.health_gate = health_gate
 
-    def register(self, name: str, organ: Organ, *, capability: str = "") -> None:
+    def register(
+        self,
+        name: str,
+        organ: Organ,
+        *,
+        capability: str = "",
+        retry_policy: OrganRetryPolicy | None = None,
+    ) -> None:
         name = name.strip()
         capability = capability.strip()
         if not name or name.startswith("_"):
@@ -42,6 +53,10 @@ class OrganRegistry:
             self._capabilities[name] = capability
         else:
             self._capabilities.pop(name, None)
+        if retry_policy is not None:
+            self._retry_policies[name] = retry_policy
+        else:
+            self._retry_policies.pop(name, None)
 
     @property
     def names(self) -> tuple[str, ...]:
@@ -59,7 +74,16 @@ class OrganRegistry:
                 blocked=True,
                 reason=self.health_gate.rejection_reason(capability),
             )
-        result = organ(goal, observation)
-        if not isinstance(result, OrganResult):
-            raise TypeError("organ must return OrganResult")
-        return result
+
+        policy = self._retry_policies.get(name, OrganRetryPolicy())
+        for attempt in range(1, policy.max_attempts + 1):
+            try:
+                result = organ(goal, observation)
+            except (TimeoutError, ConnectionError):
+                if attempt < policy.max_attempts:
+                    continue
+                raise
+            if not isinstance(result, OrganResult):
+                raise TypeError("organ must return OrganResult")
+            return result
+        raise RuntimeError("organ retry loop exhausted")
