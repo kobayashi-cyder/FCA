@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import sleep
 from typing import Callable
 
 from .provider_gate import ProviderHealthGate
@@ -30,11 +31,17 @@ class OrganRegistry:
     idempotency declaration, justification, and exception allow-list.
     """
 
-    def __init__(self, *, health_gate: ProviderHealthGate | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        health_gate: ProviderHealthGate | None = None,
+        sleeper: Callable[[float], None] = sleep,
+    ) -> None:
         self._organs: dict[str, Organ] = {}
         self._capabilities: dict[str, str] = {}
         self._retry_policies: dict[str, OrganRetryPolicy] = {}
         self.health_gate = health_gate
+        self._sleeper = sleeper
 
     def register(
         self,
@@ -84,6 +91,8 @@ class OrganRegistry:
                     exc, policy.retryable_exceptions
                 )
                 if retryable and attempt < policy.max_attempts:
+                    if policy.retry_delay_seconds:
+                        self._sleeper(float(policy.retry_delay_seconds))
                     continue
                 raise
             if not isinstance(result, OrganResult):
