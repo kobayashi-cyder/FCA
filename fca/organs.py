@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from random import random
 from time import sleep
 from typing import Callable
 
@@ -36,12 +37,14 @@ class OrganRegistry:
         *,
         health_gate: ProviderHealthGate | None = None,
         sleeper: Callable[[float], None] = sleep,
+        jitter_source: Callable[[], float] = random,
     ) -> None:
         self._organs: dict[str, Organ] = {}
         self._capabilities: dict[str, str] = {}
         self._retry_policies: dict[str, OrganRetryPolicy] = {}
         self.health_gate = health_gate
         self._sleeper = sleeper
+        self._jitter_source = jitter_source
 
     def register(
         self,
@@ -92,7 +95,12 @@ class OrganRegistry:
                     exc, policy.retryable_exceptions
                 )
                 if retryable and attempt < policy.max_attempts:
-                    delay = policy.delay_before_attempt(attempt, elapsed_delay=elapsed_delay)
+                    jitter_unit = self._jitter_source() if policy.retry_jitter_ratio else 0.5
+                    delay = policy.delay_before_attempt(
+                        attempt,
+                        elapsed_delay=elapsed_delay,
+                        jitter_unit=jitter_unit,
+                    )
                     if policy.retry_delay_seconds and delay <= 0:
                         raise
                     if delay:
