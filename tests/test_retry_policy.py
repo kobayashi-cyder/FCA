@@ -14,6 +14,9 @@ class OrganRetryPolicyTests(unittest.TestCase):
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=-0.1)
         with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_delay_seconds=60.1)
         with self.assertRaises(ValueError): OrganRetryPolicy(retry_delay_seconds=1)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_backoff_multiplier=0.9)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_backoff_multiplier=4.1)
+        with self.assertRaises(ValueError): OrganRetryPolicy(2, True, "read only", retry_backoff_multiplier=2)
 
     def test_declared_timeout_retries_when_explicitly_safe(self):
         calls = []
@@ -36,6 +39,22 @@ class OrganRetryPolicyTests(unittest.TestCase):
         reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=0.25))
         self.assertEqual(reg.run("read", "goal", "state").observation, "recovered")
         self.assertEqual(delays, [0.25, 0.25])
+
+    def test_retry_backoff_progresses_with_fca_attempt_cap(self):
+        calls, delays = [], []
+        def organ(goal, observation):
+            calls.append(1)
+            if len(calls) < 3: raise TimeoutError("temporary")
+            return OrganResult("recovered")
+        reg = OrganRegistry(sleeper=delays.append)
+        reg.register("read", organ, retry_policy=OrganRetryPolicy(3, True, "read-only lookup", retryable_exceptions=(TimeoutError,), retry_delay_seconds=10, retry_backoff_multiplier=2))
+        self.assertEqual(reg.run("read", "goal", "state").observation, "recovered")
+        self.assertEqual(delays, [10.0, 20.0])
+
+    def test_backoff_delay_is_bounded(self):
+        policy = OrganRetryPolicy(3, True, "read-only lookup", retry_delay_seconds=40, retry_backoff_multiplier=4)
+        self.assertEqual(policy.delay_before_attempt(1), 40.0)
+        self.assertEqual(policy.delay_before_attempt(2), 60.0)
 
     def test_terminal_exception_never_sleeps(self):
         delays = []
