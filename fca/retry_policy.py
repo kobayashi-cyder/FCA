@@ -18,6 +18,7 @@ class OrganRetryPolicy:
     justification: str = ""
     retryable_exceptions: tuple[type[Exception], ...] = ()
     retry_delay_seconds: float = 0.0
+    retry_backoff_multiplier: float = 1.0
 
     def __post_init__(self) -> None:
         if not 1 <= int(self.max_attempts) <= 3:
@@ -35,7 +36,20 @@ class OrganRetryPolicy:
             raise ValueError("retry_delay_seconds must be between 0 and 60")
         if self.retry_delay_seconds and self.max_attempts <= 1:
             raise ValueError("retry delay requires max_attempts > 1")
+        if not 1.0 <= float(self.retry_backoff_multiplier) <= 4.0:
+            raise ValueError("retry_backoff_multiplier must be between 1 and 4")
+        if self.retry_backoff_multiplier != 1.0 and not self.retry_delay_seconds:
+            raise ValueError("retry backoff requires retry_delay_seconds > 0")
 
     @property
     def enabled(self) -> bool:
         return self.max_attempts > 1
+
+    def delay_before_attempt(self, attempt: int) -> float:
+        """Return bounded delay after ``attempt`` failed, before the next try."""
+        if not self.retry_delay_seconds:
+            return 0.0
+        delay = float(self.retry_delay_seconds) * (
+            float(self.retry_backoff_multiplier) ** max(0, int(attempt) - 1)
+        )
+        return min(60.0, delay)
