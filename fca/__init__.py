@@ -6,6 +6,7 @@ from .canary import CanaryObservation, StagedCanary
 from .capability import CapabilityPriorityEngine, GapEvidence, GapKind
 from .concepts import ConceptGraph, Fact
 from .exchange import ExchangeCapsule
+from .exchange_registry import ExchangeEvidence, ExchangeRegistry, ExchangeState
 from .goal_contract import CriterionAssessment, GoalAssessment, GoalContract, GoalCritic
 from .hypothesis import Hypothesis, HypothesisCompetition, HypothesisEngine
 from .importers import edge_csv_to_manifest
@@ -20,7 +21,7 @@ from .wiring_manifest import ConnectomeManifest, WiringUnit
 __all__ = [
     "FCAAgent", "Decision", "CanaryObservation", "StagedCanary",
     "CapabilityPriorityEngine", "GapEvidence", "GapKind",
-    "ConceptGraph", "Fact", "ExchangeCapsule",
+    "ConceptGraph", "Fact", "ExchangeCapsule", "ExchangeEvidence", "ExchangeRegistry", "ExchangeState",
     "GoalContract", "CriterionAssessment", "GoalAssessment", "GoalCritic",
     "Hypothesis", "HypothesisCompetition", "HypothesisEngine",
     "edge_csv_to_manifest", "AutonomousLoop", "GoalReport", "Step",
