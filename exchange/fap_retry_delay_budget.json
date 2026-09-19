@@ -1,0 +1,24 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "5f6d95d624b912195bfdae9d006b724f9c973405",
+  "capability": "bounded_total_retry_delay_budget",
+  "mechanism": {
+    "source_surface": "candidates/goal_completion_loop/fap_goal_loop/resilient_capability.py",
+    "pattern": "cumulative_retry_delay_budget_with_fail_closed_exhaustion"
+  },
+  "evidence": {
+    "status": "adapted_with_focused_fca_tests",
+    "fap_tests": "candidates/goal_completion_loop/tests/test_retry_jitter.py",
+    "fca_tests": "tests/test_retry_policy.py"
+  },
+  "constraints": [
+    "Connectome routing remains authoritative for organ selection.",
+    "Delay budgeting applies only after a connectome-selected organ raises an explicitly allow-listed exception.",
+    "Retry still requires idempotency, justification, and a maximum of three FCA attempts.",
+    "FCA total retry delay is bounded to 120 seconds, stricter than FAP's 240-second ceiling.",
+    "Each individual delay remains capped at 60 seconds.",
+    "When the remaining delay budget is exhausted, FCA fails closed rather than starting another retry.",
+    "FAP jitter is intentionally not imported in this capsule; this change imports only the independently bounded cumulative delay budget."
+  ]
+}
