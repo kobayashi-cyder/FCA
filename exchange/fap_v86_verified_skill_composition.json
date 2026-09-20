@@ -1,0 +1,28 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "2bac3b44ff48aa324126f7eff0e01b99054f51cc",
+  "capability": "verified_declarative_skill_composition",
+  "mechanism": {
+    "name": "verified binding declarative skill DAG",
+    "source_release": "V86",
+    "adaptation": "FCA-side bounded composer outside the connectome controller"
+  },
+  "evidence": {
+    "checks": [
+      "FAP V86 composes only pre-registered verified deterministic side-effect-free bindings",
+      "FAP V86 uses declarative DAGs rather than generated source code",
+      "FAP V86 rejects cycles, dead nodes and graphs above 12 nodes",
+      "FAP V86 gates promotion with unit, boundary, deterministic replay and shadow holdouts",
+      "FAP V86 dedicated workflow includes V78-V86 regression targets on Python 3.11 and 3.12"
+    ]
+  },
+  "constraints": [
+    "does not alter FCA connectome sensing, sparse KC activation, MBON competition, reward plasticity or action selection",
+    "does not generate, import or eval source code",
+    "bindings must be host-provided and already verified, deterministic and side-effect-free",
+    "maximum 12 nodes; graph must be acyclic and every node must contribute to the output",
+    "this bounded adaptation does not import FAP V86's autonomous invention or sparse-routing bridge"
+  ],
+  "digest": "aeb854fec679560c32689417d43c628a0a01beeb53526cbdd5434ee4d363564c"
+}
