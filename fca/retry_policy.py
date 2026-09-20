@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import isfinite
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,7 @@ class OrganRetryPolicy:
         *,
         elapsed_delay: float = 0.0,
         jitter_unit: float = 0.5,
+        retry_after_seconds: object = None,
     ) -> float:
         """Return bounded delay after ``attempt`` failed within the total budget."""
         if not self.retry_delay_seconds:
@@ -74,4 +76,11 @@ class OrganRetryPolicy:
         if self.retry_jitter_ratio:
             centered = (2.0 * float(jitter_unit)) - 1.0
             delay *= 1.0 + (float(self.retry_jitter_ratio) * centered)
+        try:
+            hinted_delay = float(retry_after_seconds)
+        except (TypeError, ValueError):
+            hinted_delay = 0.0
+        if not isfinite(hinted_delay) or hinted_delay < 0:
+            hinted_delay = 0.0
+        delay = max(delay, hinted_delay)
         return min(60.0, max(0.0, delay), remaining)
