@@ -62,7 +62,9 @@ See `docs/FAP_LINEAGE.md` and `docs/ARCHITECTURE.md`.
 
 ## Current status
 
-This first FCA mainline establishes the executable core and the verified-improvement skeleton.
+The current FCA mainline establishes the executable core, verified-improvement skeleton, and a connectome-native import of FAP V78's Gemma 4 distilled procedural circuits.
+
+The V78 import does **not** turn FCA into an LLM. The 10 distilled circuits are converted into bounded priors over existing MBON-like action channels *after* FCA computes its sparse KC pattern. Reward-prediction-error learning remains active, while 22 teacher memories stay explicitly shadow/unverified and 27 concept relations are imported as unverified facts.
 
 Run:
 
