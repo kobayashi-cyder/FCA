@@ -1,0 +1,27 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "858eab94cf35a78060e28853ba191239c5b39f93",
+  "capability": "verified_experience_promotion_gate",
+  "mechanism": {
+    "name": "replay-protected verified experience promotion",
+    "source_release": "V79",
+    "adaptation": "generic evidence gate for FCA-local learning candidates"
+  },
+  "evidence": {
+    "checks": [
+      "FAP V79 requires distinct evidence IDs before promotion",
+      "FAP V79 rejects duplicate evidence from advancing promotion",
+      "FAP V79 separates ephemeral, shadow, consolidated, and rejected states",
+      "FAP V79 verification passed on Python 3.11 and 3.12 with V78/V75/V71 regressions"
+    ]
+  },
+  "constraints": [
+    "does not alter connectome sensing, sparse KC activation, MBON competition, or reward plasticity",
+    "promotion requires verified reward >= 0.70",
+    "three distinct successful evidence IDs are required for consolidated state",
+    "duplicate evidence is rejected and cannot advance promotion",
+    "this gate records learning evidence only; it does not automatically promote factual Knowledge"
+  ],
+  "digest": "6ab9fdeb91e96437e64b0ed20b193863c2a3324bf300d979b1373f5e0b52578c"
+}
