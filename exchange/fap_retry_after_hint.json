@@ -1,0 +1,21 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "direction": "FAP->FCA",
+  "source_repository": "kobayashi-cyder/FAP",
+  "source_commit": "3dc56198ed2c1a5fa59b4a8e3a93c0594a0d37be",
+  "mechanism": "bounded provider retry-after hints",
+  "evidence": [
+    "FAP source accepts retry_after_seconds from transient provider failure metadata",
+    "FAP source rejects malformed, negative, NaN, and infinite hints",
+    "FAP source caps each hinted delay at 60 seconds and the remaining cumulative delay budget",
+    "FAP focused tests verify hint elevation, malformed-hint fallback, and executor behavior"
+  ],
+  "constraints": [
+    "FCA connectome remains the organ selector",
+    "FCA reads retry_after_seconds only from an exception already allow-listed by the organ retry policy",
+    "a provider hint cannot make an undeclared exception retryable",
+    "retry remains opt-in, idempotent-only, justification-required, and capped at 3 attempts",
+    "FCA cumulative retry delay remains capped at 120 seconds and each delay at 60 seconds",
+    "malformed, negative, NaN, and infinite provider hints are ignored"
+  ]
+}
