@@ -64,7 +64,12 @@ Status: control-plane skeleton implemented; sandbox/holdout integration next.
 - provenance chain — implemented.
 
 ## FCA-6 — Distillation into circuit priors
-- distill repeated provider/teacher behavior into compact local rules;
+Status: initial native integration implemented.
+
+- distill repeated provider/teacher behavior into compact local rules — FAP V78 Gemma 4 circuit import implemented;
+- attach procedural priors to sparse KC/MBON action competition without replacing the connectome core — implemented;
+- preserve teacher-derived factual-looking memory as unverified shadow state — implemented;
+- seed Hot/Cold Memory and ConceptGraph through explicit import functions — implemented;
 - promote only repeatedly verified patterns;
 - measure capability retained per byte/RAM/latency;
 - prefer irreversible compact structure when it preserves verified behavior.

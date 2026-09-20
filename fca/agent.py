@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from math import isfinite
-from typing import Any
+from typing import Any, Mapping
 
 from .connectome import KenyonLayer, MBONPolicy, SensoryHash, SparsePattern, TemporalTrace
 
@@ -12,12 +12,17 @@ class Decision:
     action: str
     pattern: SparsePattern
     scores: dict[str, float]
+    biases: dict[str, float] = field(default_factory=dict)
 
 
 class FCAAgent:
     """Minimal Fly Connectome Agent loop.
 
     sense -> sparse KC code -> competing action channels -> act -> reward -> plasticity
+
+    Subclasses may provide a bounded score bias from compact circuit priors.
+    The sparse connectome pattern is always computed first and reward learning
+    still updates the MBON-like policy itself.
     """
 
     def __init__(self, actions: tuple[str, ...] = ("respond", "inspect", "wait")) -> None:
@@ -27,12 +32,37 @@ class FCAAgent:
         self.policy = MBONPolicy(actions)
         self.last_decision: Decision | None = None
 
+    def score_bias(self, observation: str, pattern: SparsePattern) -> Mapping[str, float]:
+        """Optional bounded prior over existing action channels."""
+        return {}
+
     def decide(self, observation: str) -> Decision:
         vec = self.sensory.encode_text(observation)
         pattern = self.kc.activate(vec, self.trace.state)
         self.trace.update(pattern)
-        scores = self.policy.scores(pattern)
-        decision = Decision(action=self.policy.select(pattern), pattern=pattern, scores=scores)
+
+        neural_scores = self.policy.scores(pattern)
+        raw_biases = dict(self.score_bias(observation, pattern))
+        unknown = set(raw_biases) - set(self.policy.actions)
+        if unknown:
+            raise ValueError(f"score bias contains unknown actions: {sorted(unknown)}")
+
+        biases: dict[str, float] = {}
+        for action in self.policy.actions:
+            value = float(raw_biases.get(action, 0.0))
+            if not isfinite(value):
+                raise ValueError("score bias must be finite")
+            biases[action] = value
+
+        scores = {
+            action: neural_scores[action] + biases[action]
+            for action in self.policy.actions
+        }
+        action = max(
+            self.policy.actions,
+            key=lambda name: (scores[name], -self.policy.actions.index(name)),
+        )
+        decision = Decision(action=action, pattern=pattern, scores=scores, biases=biases)
         self.last_decision = decision
         return decision
 

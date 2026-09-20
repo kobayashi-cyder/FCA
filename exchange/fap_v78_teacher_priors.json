@@ -1,0 +1,28 @@
+{
+  "schema": "fca-fap.exchange.v1",
+  "source_project": "FAP",
+  "source_commit": "80d25a917f943801ffc734a205185b7a511e4dee",
+  "capability": "gemma4_distilled_circuit_priors",
+  "mechanism": {
+    "source_release": "V78",
+    "circuits": 10,
+    "shadow_memory": 22,
+    "concept_nodes": 28,
+    "concept_edges": 27,
+    "integration": "connectome_pattern_prior_to_mbon_action_bias",
+    "data_path": "fca/data/fap_v78"
+  },
+  "evidence": {
+    "source_artifact_sha256": "e12f51a37681d3aabb4dd00d320fe1bf31362a7e939e454b4e7abc1f7db66909",
+    "source_selftest": "PASS",
+    "fap_v78_ci": "python_3.11_3.12_pass",
+    "fap_pr": 26
+  },
+  "constraints": [
+    "teacher memory remains unverified shadow evidence",
+    "connectome sparse pattern remains primary controller",
+    "priors bias MBON selection but do not bypass reward plasticity",
+    "no Gemma 4 neural weights are embedded"
+  ],
+  "digest": "9023ba3f28d1d146123875aa9c3b198b661a3f10673d01201f22e2d1503b0491"
+}

@@ -4,9 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fly-connectome-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "A compact autonomous-agent architecture centered on sparse connectome-inspired computation."
 requires-python = ">=3.11"
 
 [tool.setuptools]
 packages = ["fca"]
+
+[tool.setuptools.package-data]
+fca = ["data/fap_v78/*.json"]

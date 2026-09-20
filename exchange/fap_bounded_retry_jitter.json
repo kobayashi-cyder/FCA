@@ -1,19 +1,26 @@
 {
   "schema": "fca-fap.exchange.v1",
-  "direction": "FAP->FCA",
-  "source_repository": "kobayashi-cyder/FAP",
+  "source_project": "FAP",
   "source_commit": "5f6d95d624b912195bfdae9d006b724f9c973405",
-  "mechanism": "bounded retry jitter",
-  "evidence": [
-    "FAP source adds retry_jitter_ratio bounded to 0..0.5",
-    "FAP source injects jitter_source for deterministic verification",
-    "FAP tests verify jitter bounds and compatibility with cumulative delay budget"
-  ],
+  "capability": "bounded_retry_jitter",
+  "mechanism": {
+    "name": "bounded retry jitter",
+    "direction": "FAP->FCA",
+    "source_repository": "kobayashi-cyder/FAP"
+  },
+  "evidence": {
+    "checks": [
+      "FAP source adds retry_jitter_ratio bounded to 0..0.5",
+      "FAP source injects jitter_source for deterministic verification",
+      "FAP tests verify jitter bounds and compatibility with cumulative delay budget"
+    ]
+  },
   "constraints": [
     "FCA connectome remains the organ selector",
     "jitter applies only after a selected organ raises an explicitly allow-listed retryable exception",
     "retry remains opt-in, idempotent-only, justification-required, and capped at 3 attempts",
     "FCA cumulative retry delay remains capped at 120 seconds",
     "jitter ratio is capped at 0.5 and requires a positive base retry delay"
-  ]
+  ],
+  "digest": "03017faf362670b794bcb0da32c8338d5ef40af3eab104c5e554aac1e72410b9"
 }

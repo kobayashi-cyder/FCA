@@ -38,6 +38,9 @@ class AutonomousLoop:
     FAP-derived stall guards stop no-progress/repetition loops.
     With a checkpoint store FCA can resume after interruption while preserving
     trace state and learned action values.
+
+    A compatible FCAAgent may be injected so compact circuit priors can influence
+    MBON competition without bypassing the connectome-first controller.
     """
 
     def __init__(
@@ -50,6 +53,7 @@ class AutonomousLoop:
         same_action_limit: int = 3,
         min_progress_delta: float = 0.01,
         store: JSONGoalCheckpointStore | None = None,
+        agent: FCAAgent | None = None,
     ) -> None:
         if min(max_steps, blocker_limit, no_progress_limit, same_action_limit) < 1:
             raise ValueError("budgets must be positive")
@@ -58,7 +62,9 @@ class AutonomousLoop:
         if not registry.names:
             raise ValueError("registry must contain at least one organ")
         self.registry = registry
-        self.agent = FCAAgent(actions=registry.names)
+        self.agent = agent or FCAAgent(actions=registry.names)
+        if set(self.agent.policy.actions) != set(registry.names):
+            raise ValueError("agent actions must match registered organs")
         self.max_steps = max_steps
         self.blocker_limit = blocker_limit
         self.no_progress_limit = no_progress_limit
