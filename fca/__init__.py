@@ -17,6 +17,13 @@ from .provider_gate import ProviderHealth, ProviderHealthGate
 from .provenance import ProvenanceChain, ProvenanceEvent
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
+from .teacher_priors import (
+    FAPV78CircuitPriors,
+    TeacherActivation,
+    TeacherAwareFCAAgent,
+    TeacherCircuit,
+    TeacherPriorError,
+)
 from .wiring_manifest import ConnectomeManifest, WiringUnit
 
 __all__ = [
@@ -30,4 +37,6 @@ __all__ = [
     "CandidateLifecycle", "CandidateState", "Evidence", "FailureMemory", "FailureRecord",
     "HotColdMemory", "MemoryItem", "OrganBid", "ValueScheduler",
     "JSONGoalCheckpointStore", "ConnectomeManifest", "WiringUnit",
+    "FAPV78CircuitPriors", "TeacherActivation", "TeacherAwareFCAAgent",
+    "TeacherCircuit", "TeacherPriorError",
 ]
