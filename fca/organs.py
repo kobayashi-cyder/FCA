@@ -100,6 +100,7 @@ class OrganRegistry:
                         attempt,
                         elapsed_delay=elapsed_delay,
                         jitter_unit=jitter_unit,
+                        retry_after_seconds=getattr(exc, "retry_after_seconds", None),
                     )
                     if policy.retry_delay_seconds and delay <= 0:
                         raise
