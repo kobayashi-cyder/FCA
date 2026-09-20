@@ -46,6 +46,7 @@ The FAP release archive records:
 - V75 — managed bounded chat
 - V76 — Android Python packaging
 - V77 — bounded HTTPS image-provider adapter
+- V78 — Gemma 4 direct-learning integration: 10 consolidated procedural circuits, 22 teacher-shadow memories, 28 concept nodes and 27 concept edges
 
 ## What FCA keeps
 
@@ -73,3 +74,10 @@ FAP accumulated multiple cognitive mechanisms around a software control plane. F
 **the primary controller must remain a compact connectome-inspired dynamical system.**
 
 High-capability providers may help, but their outputs enter as sensory evidence, candidate actions or specialist-organ results. They are not the architectural identity of FCA.
+
+
+## FCA native V78 adaptation
+
+FCA imports V78 as **circuit priors**, not as a replacement responder. The input still flows through FCA's sensory projection and sparse KC competition first. V78 circuits compare against that sparse state and can add only a bounded bias to existing MBON-like action channels. Reward outcomes continue to train local MBON weights.
+
+Teacher-derived memory is deliberately imported with sub-0.70 confidence and remains unverified. Concept relations are imported with `verified=False`. This keeps the original FCA rule that teacher output is evidence, not automatically factual Knowledge.
