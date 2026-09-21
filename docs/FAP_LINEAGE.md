@@ -23,7 +23,7 @@ FAP documentation records the following progression:
 - V53 — rich natural chat
 - V54 — dataset-distillation direction
 
-Independent release snapshots for V55–V60 were not found in the current repository at the time FCA was bootstrapped. FCA must not invent their contents; if recovered later, add them here with evidence.
+Independent release snapshots for V55–V60 were not found when FCA was bootstrapped. FCA must not invent their contents.
 
 ## Verified autonomy/control line
 
@@ -46,7 +46,29 @@ The FAP release archive records:
 - V75 — managed bounded chat
 - V76 — Android Python packaging
 - V77 — bounded HTTPS image-provider adapter
-- V78 — Gemma 4 direct-learning integration: 10 consolidated procedural circuits, 22 teacher-shadow memories, 28 concept nodes and 27 concept edges
+- V78 — Gemma 4 direct-learning integration
+- V79 — verified experience promotion gate
+- V86 — verified declarative skill composition
+
+## Later execution line used by FCA v0.3
+
+Verified source commits:
+
+- V87.34 Scene Graph 2 — `36d0530af4dad799a829c54521b82d311fcaac8e`
+- V87.37 Sparse End-to-End Execution — `5ad4c1543777296b5f2ed37a90ebacfcbf1c17c7`
+- V87.39 Native Geometry + Sparse LBS — `fdb9c0cd5d7bab6c1eda1c1496558c0b483de64a`
+
+FCA imports the following *patterns*:
+
+- explicit object/state/relation structure;
+- negative constraints;
+- route-before-load sparse execution;
+- lazy cached organs;
+- observable active/loaded state;
+- hot-loop acceleration behind a stable semantic boundary;
+- deterministic fallback when acceleration is absent or fails.
+
+FCA does **not** import V87's cat/DNA/image identity into the controller.
 
 ## What FCA keeps
 
@@ -65,19 +87,35 @@ FCA keeps mechanisms that generalize:
 - rollback/quarantine;
 - failure-driven capability growth;
 - provider health gates;
-- bounded external interfaces.
+- bounded external interfaces;
+- explicit task/world relations;
+- lazy specialist loading;
+- verified native fallback.
 
 ## What FCA changes
 
-FAP accumulated multiple cognitive mechanisms around a software control plane. FCA changes the center:
+FAP accumulated multiple cognitive and media mechanisms around a software control plane. FCA changes the center:
 
-**the primary controller must remain a compact connectome-inspired dynamical system.**
+**the primary controller remains a compact connectome-inspired dynamical system.**
 
-High-capability providers may help, but their outputs enter as sensory evidence, candidate actions or specialist-organ results. They are not the architectural identity of FCA.
-
+High-capability providers may help, but their outputs enter as sensory evidence, candidate actions or specialist-organ results.
 
 ## FCA native V78 adaptation
 
-FCA imports V78 as **circuit priors**, not as a replacement responder. The input still flows through FCA's sensory projection and sparse KC competition first. V78 circuits compare against that sparse state and can add only a bounded bias to existing MBON-like action channels. Reward outcomes continue to train local MBON weights.
+FCA imports V78 as **circuit priors**, not as a replacement responder. Input still flows through sensory projection and sparse KC competition first. V78 circuits can add only a bounded bias to existing MBON-like action channels. Reward outcomes continue to train local MBON weights.
 
-Teacher-derived memory is deliberately imported with sub-0.70 confidence and remains unverified. Concept relations are imported with `verified=False`. This keeps the original FCA rule that teacher output is evidence, not automatically factual Knowledge.
+Teacher-derived memory remains explicitly unverified until promoted by evidence.
+
+## FCA v0.3 adaptation
+
+V87-era mechanisms are placed *around* the controller:
+
+```text
+connectome decision
+  -> lazy specialist
+  -> verified outcome
+  -> explicit WorldGraph relation
+  -> local plasticity
+```
+
+Optional native acceleration is subordinate to a Python reference path and may not redefine controller semantics.
