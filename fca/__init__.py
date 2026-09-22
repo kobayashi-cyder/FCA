@@ -36,6 +36,12 @@ from .repository_organ import (
     RepositoryCodingOrgan,
     register_repository_coding_organ,
 )
+from .repository_host_adapter import (
+    FAP_REPOSITORY_HOST_CONTRACT,
+    RepositoryHostContractError,
+    adapt_fap_repository_host,
+    repository_host_runner_from_mapping,
+)
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
 from .teacher_priors import (
@@ -69,5 +75,7 @@ __all__ = [
     "RepositoryExchangeReceipt", "RepositoryFileEvidence",
     "RepositoryCodingHostBinding", "RepositoryCodingHostResult",
     "RepositoryCodingOrgan", "register_repository_coding_organ",
+    "FAP_REPOSITORY_HOST_CONTRACT", "RepositoryHostContractError",
+    "adapt_fap_repository_host", "repository_host_runner_from_mapping",
     "Entity", "Relation", "WorldGraph",
 ]

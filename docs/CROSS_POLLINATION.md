@@ -56,3 +56,30 @@ FCA receives this through `RepositoryEvidenceImporter`.
 Receiving a valid capsule only enters the existing `ExchangeRegistry`. It does not create an organ, execute code, modify MBON action selection, or advance directly to `SHADOW`/`ACCEPTED`.
 
 Independent FCA evidence is still required for state promotion. Duplicate receipt does not count as new evidence.
+
+
+## Repository host contract adapter
+
+FAP repository coding execution remains outside FCA. A host may expose the
+provider-neutral `fap.repository.host.v1` response as a plain JSON-like mapping.
+
+FCA validates that mapping through `adapt_fap_repository_host()` before it can
+be used by `RepositoryCodingOrgan`.
+
+The adapter:
+
+- imports no FAP module;
+- accepts only the documented host metadata fields;
+- rejects unknown fields so diffs/source/edit payloads cannot cross the boundary;
+- validates state, SHA-256 identifiers, progress, attempt/repair bounds and safe
+  reason codes;
+- can wrap in-process or IPC transports with
+  `repository_host_runner_from_mapping()`.
+
+This keeps the dependency direction neutral:
+
+`connectome selection -> FCA organ -> strict data contract -> host -> FAP`
+
+FAP still owns repository planning, sandboxed edits and verification. FCA still
+owns capability selection and evidence gating. Neither side gains automatic
+promotion authority from this adapter.
