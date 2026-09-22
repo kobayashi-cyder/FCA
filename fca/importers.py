@@ -144,7 +144,7 @@ def flywire_codex_files_to_manifest(
         post_labels=post_values,
         max_selected_ids=int(max_selected_ids),
     )
-    pair_weights = _codex_selected_pair_weights(
+    pair_weights, pair_regions = _codex_selected_pair_weights(
         connections,
         pre_ids=pre_ids,
         post_ids=post_ids,
@@ -162,21 +162,29 @@ def flywire_codex_files_to_manifest(
     used_pre = sorted({pre for pre, _ in retained})
     pre_index = {root_id: i for i, root_id in enumerate(used_pre)}
     by_post: dict[str, set[int]] = {}
+    by_post_regions: dict[str, set[str]] = {}
     for pre, post in retained:
         by_post.setdefault(post, set()).add(pre_index[pre])
+        by_post_regions.setdefault(post, set()).update(
+            pair_regions.get((pre, post), ())
+        )
 
     if len(by_post) > int(max_units):
         raise ValueError("selected Codex unit count exceeds max_units")
 
-    units = [
-        {
+    units = []
+    for post, inputs in sorted(by_post.items()):
+        if not inputs:
+            continue
+        unit = {
             "id": post,
             "class": post_class,
             "inputs": sorted(inputs),
         }
-        for post, inputs in sorted(by_post.items())
-        if inputs
-    ]
+        regions = sorted(by_post_regions.get(post, ()))
+        if regions:
+            unit["regions"] = regions
+        units.append(unit)
     if not units:
         raise ValueError("no connected post units")
 
@@ -257,14 +265,16 @@ def _codex_selected_pair_weights(
     pre_ids: frozenset[str],
     post_ids: frozenset[str],
     max_candidate_pairs: int,
-) -> dict[tuple[str, str], float]:
+) -> tuple[dict[tuple[str, str], float], dict[tuple[str, str], set[str]]]:
     pair_weights: dict[tuple[str, str], float] = {}
+    pair_regions: dict[tuple[str, str], set[str]] = {}
     with _open_codex_text(path) as fh:
         reader = csv.DictReader(fh)
         fields = tuple(reader.fieldnames or ())
         pre_column = _detect_column(fields, _CODEX_PRE_COLUMNS, "presynaptic ID")
         post_column = _detect_column(fields, _CODEX_POST_COLUMNS, "postsynaptic ID")
         weight_column = _detect_column(fields, _CODEX_WEIGHT_COLUMNS, "synapse count")
+        neuropil_column = "neuropil" if "neuropil" in fields else None
 
         for row in reader:
             pre = str(row.get(pre_column, "") or "").strip()
@@ -284,9 +294,15 @@ def _codex_selected_pair_weights(
             if key not in pair_weights and len(pair_weights) >= max_candidate_pairs:
                 raise ValueError("selected Codex pairs exceed max_candidate_pairs")
             pair_weights[key] = pair_weights.get(key, 0.0) + weight
+            if neuropil_column is not None:
+                region = str(row.get(neuropil_column, "") or "").strip()
+                if region:
+                    if len(region) > 256:
+                        raise ValueError("Codex neuropil label is oversized")
+                    pair_regions.setdefault(key, set()).add(region)
     if not pair_weights:
         raise ValueError("no connections matched selected Codex IDs")
-    return pair_weights
+    return pair_weights, pair_regions
 
 
 def _open_codex_text(path: Path):
