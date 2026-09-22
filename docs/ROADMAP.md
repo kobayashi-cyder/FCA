@@ -53,11 +53,11 @@ Status: manifest/import boundary implemented; real dataset ingestion next.
 FAP V69–V77 boundaries should be reused where they remain valid.
 
 ## FCA-5 — Verified structural self-improvement
-Status: sandbox/holdout gate and external evaluator controller integrated; candidate generation provider next.
+Status: metadata-only candidate generation provider and sandbox/holdout evaluation pipeline integrated.
 
 - Failure Memory — implemented;
 - capability-gap clustering/prioritization — implemented;
-- candidate generation — provider boundary next;
+- candidate generation — metadata-only provider boundary implemented;
 - sandbox/holdout evaluator controller — implemented;
 - sandbox/resource/holdout gates — evidence-isolated gate implemented;
 - sandbox and holdout evidence must both pass before SHADOW;
