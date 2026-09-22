@@ -32,10 +32,11 @@ Status: initial implementation.
 - hypothesis generation/competition — implemented.
 
 ## FCA-3 — Data-backed connectome wiring
-Status: manifest/import boundary implemented; real dataset ingestion next.
+Status: manifest/import boundary plus streaming FlyWire Codex static-export ingestion implemented.
 
 - define a versioned wiring manifest — implemented;
 - ingest normalized neuron/edge tables — generic PN→KC CSV converter implemented;
+- ingest real FlyWire Codex CSV/CSV.GZ exports with bounded streaming selection — implemented;
 - preserve neuron classes and compartment metadata where available;
 - compare synthetic sparse wiring against data-backed wiring;
 - benchmark behavior, latency and memory;
