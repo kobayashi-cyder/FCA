@@ -70,6 +70,7 @@ class FCACodeGenerator:
     MAX_SOURCE_BYTES = 300_000
 
     _ALLOWED_IMPORTS = {
+        "__future__",
         "argparse",
         "json",
         "re",
@@ -91,6 +92,11 @@ class FCACodeGenerator:
         src = str(request or "").strip()
         if not src:
             raise CodeGenerationError("request is required")
+        if self._has(
+            src,
+            r"javascript|\bjs\b|typescript|\bts\b|\bjava\b|\brust\b|golang|go言語|c\+\+|c#",
+        ):
+            raise CodeGenerationError("v1 currently supports Python generation")
         if not self._has(src, r"python|\.py\b|スクリプト|コード|program"):
             raise CodeGenerationError("v1 currently supports Python generation")
 
