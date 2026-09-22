@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+import math
 
 
 class GapKind(str, Enum):
@@ -44,8 +45,48 @@ class CapabilityPriorityEngine:
         self._seen: dict[str, GapEvidence] = {}
 
     def ingest(self, evidence: GapEvidence) -> None:
+        self._validate_evidence(evidence)
+        existing = self._seen.get(evidence.key)
+        if existing is not None:
+            if existing != evidence:
+                raise ValueError("conflicting duplicate gap evidence key")
+            return
         if evidence.verified:
-            self._seen.setdefault(evidence.key, evidence)
+            self._seen[evidence.key] = evidence
+
+    @staticmethod
+    def _validate_evidence(evidence: GapEvidence) -> None:
+        if not isinstance(evidence, GapEvidence):
+            raise TypeError("evidence must be GapEvidence")
+        if not isinstance(evidence.key, str) or not 1 <= len(evidence.key.strip()) <= 256:
+            raise ValueError("evidence key must be 1..256 characters")
+        if not isinstance(evidence.kind, GapKind):
+            raise TypeError("evidence kind must be GapKind")
+        if (
+            not isinstance(evidence.signature, str)
+            or not 1 <= len(evidence.signature.strip()) <= 20_000
+        ):
+            raise ValueError("evidence signature must be 1..20000 characters")
+        if not isinstance(evidence.verified, bool):
+            raise TypeError("evidence verified must be bool")
+
+        values = (
+            ("generality", evidence.generality, 0.0, False),
+            ("expected_gain", evidence.expected_gain, 0.0, False),
+            ("implementation_cost", evidence.implementation_cost, 0.0, True),
+            ("regression_risk", evidence.regression_risk, 0.0, False),
+        )
+        for name, value, minimum, strictly_positive in values:
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise TypeError(f"{name} must be numeric")
+            number = float(value)
+            if not math.isfinite(number):
+                raise ValueError(f"{name} must be finite")
+            if strictly_positive:
+                if number <= minimum:
+                    raise ValueError(f"{name} must be positive")
+            elif number < minimum:
+                raise ValueError(f"{name} must be non-negative")
 
     def priorities(self) -> list[tuple[GapKind, str, int, float]]:
         groups: dict[tuple[GapKind, str], list[GapEvidence]] = {}
