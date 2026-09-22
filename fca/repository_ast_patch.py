@@ -8,6 +8,7 @@ import re
 from typing import Any
 
 from .code_generation import CodeGenerationError, FCACodeGenerator, ProgramIR
+from .repository_generation import RepositoryEditCandidate
 
 
 class ASTPatchError(RuntimeError):
@@ -33,6 +34,18 @@ class ASTFunctionPatchResult:
         if not include_source:
             data.pop("source", None)
         return data
+
+    def to_edit_candidate(self) -> RepositoryEditCandidate:
+        if not self.ok:
+            raise ASTPatchError("cannot convert a rejected AST patch")
+        return RepositoryEditCandidate(
+            path=self.path,
+            operation="modify",
+            before_sha256=self.before_sha256,
+            after_sha256=self.after_sha256,
+            content=self.source,
+            checks=self.checks,
+        )
 
 
 class ASTFunctionPatchGenerator:
