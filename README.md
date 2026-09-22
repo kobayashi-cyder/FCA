@@ -120,6 +120,42 @@ v2 only updates files that carry FCA's own generation markers. The generator
 still performs no file writes, subprocess execution, git mutation, branch
 creation, pull request creation, or promotion.
 
+## AST patching and sandbox repair
+
+FCA can now form a bounded patch for one existing Python function body and
+verify repository edits in detached Git worktrees.
+
+```python
+from fca import (
+    ASTFunctionPatchGenerator,
+    FCASandboxRepairRunner,
+    SandboxCommand,
+)
+
+patcher = ASTFunctionPatchGenerator()
+patch = patcher.patch(
+    "Pythonコードで transform を修正して大文字にする",
+    "def transform(text):\n    return text\n",
+    target_symbol="transform",
+    path="calc.py",
+)
+
+edit = patch.to_edit_candidate()
+```
+
+The AST patcher preserves the target signature, decorators, and all text outside
+the selected function-body region. Runtime ProgramIR parameters such as
+`old`, `new`, `pattern`, and `needle` must already exist in the target
+function signature when required.
+
+`FCASandboxRepairRunner` applies candidates only in fresh detached Git
+worktrees. It validates SHA-256 preconditions, statically compiles changed
+Python files, runs explicit allow-listed argv commands without a shell, rejects
+unexpected sandbox changes, and checks that source HEAD/status remain
+unchanged. A repair provider can supply a new candidate for the same fixed
+path/operation scope; retries are capped at 0-4. The runner never creates a
+branch, commit, push, pull request, merge, or main update.
+
 ## Current execution shape
 
 ```text
