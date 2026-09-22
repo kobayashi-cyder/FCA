@@ -243,9 +243,15 @@ class ASTFunctionPatchGenerator:
                 errors.append("signature_changed")
             else:
                 checks.append("signature_ast_equal")
-            if ast.dump(node.decorator_list, include_attributes=False) != ast.dump(
-                patched_node.decorator_list, include_attributes=False
-            ):
+            original_decorators = tuple(
+                ast.dump(item, include_attributes=False)
+                for item in node.decorator_list
+            )
+            patched_decorators = tuple(
+                ast.dump(item, include_attributes=False)
+                for item in patched_node.decorator_list
+            )
+            if original_decorators != patched_decorators:
                 errors.append("decorators_changed")
             else:
                 checks.append("decorators_ast_equal")
