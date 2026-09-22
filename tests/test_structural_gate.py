@@ -46,6 +46,27 @@ class StructuralImprovementGateTests(unittest.TestCase):
         self.assertEqual(state, CandidateState.QUARANTINED)
         self.assertEqual(gate.add_evidence(self.evidence("h1", "holdout")), CandidateState.QUARANTINED)
 
+    def test_non_finite_evidence_and_canary_fail_closed(self):
+        gate = StructuralImprovementGate(self.digest, min_sandbox=1, min_holdout=1)
+        state = gate.add_evidence(
+            self.evidence("s1", "sandbox", latency_ratio=float("nan"))
+        )
+        self.assertEqual(state, CandidateState.QUARANTINED)
+
+        gate = StructuralImprovementGate(
+            self.digest,
+            min_sandbox=1,
+            min_holdout=1,
+            canary_min_evidence=1,
+        )
+        gate.add_evidence(self.evidence("s1", "sandbox"))
+        gate.add_evidence(self.evidence("h1", "holdout"))
+        status = gate.add_canary(
+            CanaryObservation("c1", self.digest, True, 0.0, float("nan"))
+        )
+        self.assertEqual(status, "rollback")
+        self.assertEqual(gate.state, CandidateState.QUARANTINED)
+
     def test_canary_is_blocked_before_shadow(self):
         gate = StructuralImprovementGate(self.digest, min_sandbox=1, min_holdout=1, canary_min_evidence=1)
         with self.assertRaises(RuntimeError):
