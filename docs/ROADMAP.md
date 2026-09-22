@@ -53,7 +53,7 @@ Status: manifest/import boundary implemented; real dataset ingestion next.
 FAP V69–V77 boundaries should be reused where they remain valid.
 
 ## FCA-5 — Verified structural self-improvement
-Status: verified-gap to metadata-only candidate evaluation pipeline integrated; automatic canary execution remains separate.
+Status: verified-gap to metadata-only candidate evaluation plus explicit one-stage canary control integrated.
 
 - Failure Memory — implemented;
 - capability-gap clustering/prioritization — implemented;
@@ -63,7 +63,7 @@ Status: verified-gap to metadata-only candidate evaluation pipeline integrated; 
 - sandbox/resource/holdout gates — evidence-isolated gate implemented;
 - sandbox and holdout evidence must both pass before SHADOW;
 - latency and memory regressions quarantine candidates;
-- SHADOW -> 5/20/50/100 staged canary -> CONSOLIDATED — integrated;
+- SHADOW -> 5/20/50/100 staged canary -> CONSOLIDATED — explicit one-stage controller integrated;
 - rollback and quarantine — integrated across evidence and canary stages;
 - provenance chain — implemented.
 
