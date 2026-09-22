@@ -10,7 +10,7 @@ from .exchange_registry import ExchangeEvidence, ExchangeRegistry, ExchangeState
 from .goal_contract import CriterionAssessment, GoalAssessment, GoalContract, GoalCritic
 from .hot_path import HotPathStatus, VerifiedHotPath
 from .hypothesis import Hypothesis, HypothesisCompetition, HypothesisEngine
-from .importers import edge_csv_to_manifest
+from .importers import edge_csv_to_manifest, flywire_codex_files_to_manifest
 from .improvement import CandidateLifecycle, CandidateState, Evidence, FailureMemory, FailureRecord
 from .lazy_organs import LazyOrganRegistry, LazyOrganSpec
 from .memory import HotColdMemory, MemoryItem
@@ -72,7 +72,7 @@ __all__ = [
     "GoalContract", "CriterionAssessment", "GoalAssessment", "GoalCritic",
     "HotPathStatus", "VerifiedHotPath",
     "Hypothesis", "HypothesisCompetition", "HypothesisEngine",
-    "edge_csv_to_manifest", "AutonomousLoop", "GoalReport", "Step",
+    "edge_csv_to_manifest", "flywire_codex_files_to_manifest", "AutonomousLoop", "GoalReport", "Step",
     "OrganRegistry", "OrganResult", "LazyOrganRegistry", "LazyOrganSpec",
     "ProviderHealth", "ProviderHealthGate", "ProvenanceChain", "ProvenanceEvent",
     "CandidateLifecycle", "CandidateState", "Evidence", "FailureMemory", "FailureRecord",
