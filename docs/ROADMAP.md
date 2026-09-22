@@ -37,7 +37,7 @@ Status: manifest/import boundary plus streaming FlyWire Codex static-export inge
 - define a versioned wiring manifest — implemented;
 - ingest normalized neuron/edge tables — generic PN→KC CSV converter implemented;
 - ingest real FlyWire Codex CSV/CSV.GZ exports with bounded streaming selection — implemented;
-- preserve neuron classes and compartment metadata where available;
+- preserve neuron classes and compartment metadata where available — optional per-unit neuropil/region metadata implemented;
 - compare synthetic sparse wiring against data-backed wiring;
 - benchmark behavior, latency and memory;
 - never silently substitute synthetic wiring while claiming biological wiring.
