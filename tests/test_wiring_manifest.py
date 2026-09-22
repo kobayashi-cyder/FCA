@@ -28,6 +28,19 @@ class WiringManifestTests(unittest.TestCase):
         p = layer.activate([1.0, 1.0, 0.0, 0.0])
         self.assertEqual(p.active, (0,))
 
+    def test_optional_regions_are_preserved(self):
+        raw = self._manifest()
+        raw["units"][0]["regions"] = ["AL_R", "MB_R", "AL_R"]
+        manifest = ConnectomeManifest.from_json(json.dumps(raw))
+        self.assertEqual(manifest.units[0].regions, ("AL_R", "MB_R"))
+        self.assertEqual(manifest.units[1].regions, ())
+
+    def test_invalid_regions_are_rejected(self):
+        raw = self._manifest()
+        raw["units"][0]["regions"] = "AL_R"
+        with self.assertRaises(ValueError):
+            ConnectomeManifest.from_json(json.dumps(raw))
+
     def test_invalid_input_index_rejected(self):
         raw = self._manifest()
         raw["units"][0]["inputs"] = [99]
