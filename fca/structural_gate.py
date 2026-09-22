@@ -92,12 +92,14 @@ class StructuralImprovementGate:
         key = str(evidence.key or "").strip()
         digest = str(evidence.candidate_digest or "").strip().lower()
         scope = str(evidence.scope or "").strip().lower()
-        if not key:
-            raise ValueError("evidence key is required")
+        if not key or len(key) > 256:
+            raise ValueError("evidence key must be 1..256 characters")
         if digest != self.candidate_digest:
             raise ValueError("candidate digest mismatch")
         if scope not in _SCOPES:
             raise ValueError("scope must be sandbox or holdout")
+        if not isinstance(evidence.passed, bool):
+            raise TypeError("evidence passed must be bool")
         if key in self._evidence:
             return self.state
 
