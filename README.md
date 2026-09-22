@@ -93,6 +93,33 @@ The generator does not write files, execute generated code, modify repositories,
 or promote candidates. Those actions remain outside the generator and preserve
 FCA's existing repository-coding approval boundary.
 
+## Repository candidate generation
+
+FCA can now lift the ProgramIR generator to repository-scale candidates without
+granting it filesystem or git authority.
+
+```python
+from fca import FCARepositoryGenerator
+
+generator = FCARepositoryGenerator()
+result = generator.generate(
+    "tools/stats.py にPythonコードを作って、数字を抽出して合計する",
+    {
+        "README.md": "# project\n",
+    },
+)
+
+assert result.ok
+for edit in result.edits:
+    print(edit.path, edit.operation, edit.after_sha256)
+```
+
+A successful candidate contains the generated module and a focused unittest,
+plus repository and file hashes. Existing human-authored files are not replaced:
+v2 only updates files that carry FCA's own generation markers. The generator
+still performs no file writes, subprocess execution, git mutation, branch
+creation, pull request creation, or promotion.
+
 ## Current execution shape
 
 ```text
