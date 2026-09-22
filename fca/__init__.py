@@ -63,6 +63,7 @@ from .teacher_priors import (
     TeacherPriorError,
 )
 from .wiring_analysis import WiringComparison, WiringStats, compare_manifest_wiring, manifest_wiring_stats
+from .wiring_benchmark import WiringBenchmark, WiringBenchmarkComparison, benchmark_manifest_runtime, compare_wiring_benchmarks
 from .wiring_manifest import ConnectomeManifest, WiringUnit
 from .world_model import Entity, Relation, WorldGraph
 
@@ -80,6 +81,7 @@ __all__ = [
     "HotColdMemory", "MemoryItem", "OrganBid", "ValueScheduler",
     "JSONGoalCheckpointStore", "ConnectomeManifest", "WiringUnit",
     "WiringComparison", "WiringStats", "compare_manifest_wiring", "manifest_wiring_stats",
+    "WiringBenchmark", "WiringBenchmarkComparison", "benchmark_manifest_runtime", "compare_wiring_benchmarks",
     "StructuralEvidence", "StructuralImprovementGate",
     "StructuralCandidateController", "StructuralCandidateEvaluation", "StructuralMeasurement",
     "StructuralImprovementCoordinator", "StructuralImprovementOutcome",

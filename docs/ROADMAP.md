@@ -39,7 +39,7 @@ Status: manifest/import boundary plus streaming FlyWire Codex static-export inge
 - ingest real FlyWire Codex CSV/CSV.GZ exports with bounded streaming selection — implemented;
 - preserve neuron classes and compartment metadata where available — optional per-unit neuropil/region metadata implemented;
 - compare synthetic sparse wiring against data-backed wiring — structural comparison metrics implemented;
-- benchmark behavior, latency and memory;
+- benchmark behavior, latency and memory — deterministic probe + local runtime benchmark utility implemented;
 - never silently substitute synthetic wiring while claiming biological wiring.
 
 ## FCA-4 — Specialist organs
