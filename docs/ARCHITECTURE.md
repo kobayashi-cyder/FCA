@@ -158,3 +158,28 @@ FCA targets practical operation on modest hardware:
 - resource-aware candidate promotion;
 - optional native hot paths with verified fallback;
 - optional providers loaded only when useful.
+
+
+## 11. Repository coding organ boundary
+
+Repository coding is a specialist organ, not a replacement controller.
+
+```text
+observation
+  -> FCA sparse connectome selection
+  -> repository_coding action selected
+  -> LazyOrganRegistry constructs adapter
+  -> exact accepted fca-fap.exchange.v1 capability check
+  -> explicitly host-provided sandbox runner
+  -> verified/rejected host result
+  -> bounded OrganResult
+  -> FCA outcome/plasticity
+```
+
+The ordering is mandatory: the connectome selects first, and only then may the host repository runner execute.
+
+FAP exchange capsules are never executed or reconstructed into edits. They provide provenance/evidence for the repository-coding mechanism only. The runnable binding must be supplied independently by the host and must declare both `sandbox_only=True` and `promotion_requires_approval=True`.
+
+A received or shadow exchange capsule blocks repository coding. Only an exact capsule digest in `ACCEPTED` state for `repository_coding_verified_candidate` unlocks the host binding. Duplicate exchange evidence does not advance the gate.
+
+A verified repository candidate produces zero automatic reward, is not terminal by itself, and does not authorize branch promotion, push, pull-request creation, merge, or main modification.

@@ -1,0 +1,47 @@
+name: FCA repository coding organ verify
+
+on:
+  push:
+    branches:
+      - feature/connectome-repository-coding-organ
+    paths:
+      - "fca/exchange_registry.py"
+      - "fca/repository_organ.py"
+      - "fca/lazy_organs.py"
+      - "fca/__init__.py"
+      - "tests/test_repository_organ.py"
+      - "docs/ARCHITECTURE.md"
+      - ".github/workflows/repository-coding-organ-verify.yml"
+  pull_request:
+    paths:
+      - "fca/exchange_registry.py"
+      - "fca/repository_organ.py"
+      - "fca/lazy_organs.py"
+      - "fca/__init__.py"
+      - "tests/test_repository_organ.py"
+      - "docs/ARCHITECTURE.md"
+      - ".github/workflows/repository-coding-organ-verify.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: Compile FCA
+        run: |
+          python -m compileall -q fca
+      - name: Run repository organ and exchange regression
+        run: |
+          python -m unittest discover -s tests -p "test_exchange_registry.py" -v
+          python -m unittest discover -s tests -p "test_repository_exchange.py" -v
+          python -m unittest discover -s tests -p "test_lazy_organs.py" -v
+          python -m unittest discover -s tests -p "test_repository_organ.py" -v
+      - name: Run connectome runtime regression
+        run: |
+          python -m unittest discover -s tests -p "test_rebuilt_runtime.py" -v

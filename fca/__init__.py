@@ -30,6 +30,12 @@ from .repository_exchange import (
     RepositoryExchangeReceipt,
     RepositoryFileEvidence,
 )
+from .repository_organ import (
+    RepositoryCodingHostBinding,
+    RepositoryCodingHostResult,
+    RepositoryCodingOrgan,
+    register_repository_coding_organ,
+)
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
 from .teacher_priors import (
@@ -61,5 +67,7 @@ __all__ = [
     "VerificationIssue", "VerificationResult",
     "RepositoryCodingEvidence", "RepositoryEvidenceImporter",
     "RepositoryExchangeReceipt", "RepositoryFileEvidence",
+    "RepositoryCodingHostBinding", "RepositoryCodingHostResult",
+    "RepositoryCodingOrgan", "register_repository_coding_organ",
     "Entity", "Relation", "WorldGraph",
 ]

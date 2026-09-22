@@ -74,6 +74,16 @@ class ExchangeRegistry:
         except KeyError as exc:
             raise KeyError("unknown exchange capsule") from exc
 
+    def allows(self, digest: str, capability: str) -> bool:
+        """Fail-closed capability check for an exact accepted capsule."""
+        record = self._records.get(str(digest))
+        if record is None:
+            return False
+        return (
+            record.state == ExchangeState.ACCEPTED
+            and record.capsule.capability == str(capability).strip()
+        )
+
     def accepted_capabilities(self) -> tuple[str, ...]:
         return tuple(
             sorted(
