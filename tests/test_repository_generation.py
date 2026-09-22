@@ -83,13 +83,14 @@ class FCARepositoryGenerationTests(unittest.TestCase):
         self.assertIn("27.0", test_source)
         self.assertIn("['extract_numbers', 'sum']", test_source)
 
-    def test_incompatible_ir_chain_fails_closed_in_test_generation(self):
+    def test_unknown_program_request_becomes_rejected_result(self):
         result = self.generator.generate(
-            "bad.py にPythonコードを作って、文字列を大文字にして合計する",
+            "bad.py にPythonコードを作って、未知の専用アルゴリズムを実装して",
             {},
         )
         self.assertFalse(result.ok)
-        self.assertIn("focused_test_generation_failed", result.errors)
+        self.assertIn("program_generation_failed", result.errors)
+        self.assertIn("CodeGenerationError", result.errors)
         self.assertEqual(result.edits, ())
 
     def test_include_tests_false_produces_single_bounded_edit(self):
