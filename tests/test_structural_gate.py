@@ -107,6 +107,12 @@ class StructuralImprovementGateTests(unittest.TestCase):
         self.assertEqual(status, "rollback")
         self.assertEqual(gate.state, CandidateState.QUARANTINED)
 
+    def test_passed_requires_real_bool(self):
+        gate = StructuralImprovementGate(self.digest)
+        evidence = StructuralEvidence("x", self.digest, "sandbox", "false")
+        with self.assertRaises(TypeError):
+            gate.add_evidence(evidence)
+
     def test_digest_and_scope_are_fail_closed(self):
         gate = StructuralImprovementGate(self.digest)
         with self.assertRaises(ValueError):
