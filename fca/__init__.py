@@ -62,6 +62,7 @@ from .teacher_priors import (
     TeacherCircuit,
     TeacherPriorError,
 )
+from .wiring_analysis import WiringComparison, WiringStats, compare_manifest_wiring, manifest_wiring_stats
 from .wiring_manifest import ConnectomeManifest, WiringUnit
 from .world_model import Entity, Relation, WorldGraph
 
@@ -78,6 +79,7 @@ __all__ = [
     "CandidateLifecycle", "CandidateState", "Evidence", "FailureMemory", "FailureRecord",
     "HotColdMemory", "MemoryItem", "OrganBid", "ValueScheduler",
     "JSONGoalCheckpointStore", "ConnectomeManifest", "WiringUnit",
+    "WiringComparison", "WiringStats", "compare_manifest_wiring", "manifest_wiring_stats",
     "StructuralEvidence", "StructuralImprovementGate",
     "StructuralCandidateController", "StructuralCandidateEvaluation", "StructuralMeasurement",
     "StructuralImprovementCoordinator", "StructuralImprovementOutcome",
