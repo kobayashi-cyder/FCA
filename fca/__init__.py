@@ -25,6 +25,11 @@ from .rebuilt_runtime import (
     VerificationIssue,
     VerificationResult,
 )
+from .repository_ast_patch import (
+    ASTFunctionPatchGenerator,
+    ASTFunctionPatchResult,
+    ASTPatchError,
+)
 from .repository_generation import (
     FCARepositoryGenerator,
     RepositoryEditCandidate,
@@ -48,6 +53,13 @@ from .repository_host_adapter import (
     RepositoryHostContractError,
     adapt_fap_repository_host,
     repository_host_runner_from_mapping,
+)
+from .repository_sandbox import (
+    FCASandboxRepairRunner,
+    SandboxAttempt,
+    SandboxCommand,
+    SandboxCommandResult,
+    SandboxRepairResult,
 )
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
@@ -100,6 +112,7 @@ __all__ = [
     "TeacherCircuit", "TeacherPriorError",
     "FCARebuiltRuntime", "IntegrityVerifier", "RuntimeStep",
     "VerificationIssue", "VerificationResult",
+    "ASTFunctionPatchGenerator", "ASTFunctionPatchResult", "ASTPatchError",
     "FCARepositoryGenerator", "RepositoryEditCandidate",
     "RepositoryGenerationError", "RepositoryGenerationResult",
     "RepositoryCodingEvidence", "RepositoryEvidenceImporter",
@@ -107,6 +120,8 @@ __all__ = [
     "RepositoryCodingHostBinding", "RepositoryCodingHostResult",
     "RepositoryCodingOrgan", "register_repository_coding_organ",
     "FAP_REPOSITORY_HOST_CONTRACT", "RepositoryHostContractError",
+    "FCASandboxRepairRunner", "SandboxAttempt", "SandboxCommand",
+    "SandboxCommandResult", "SandboxRepairResult",
     "adapt_fap_repository_host", "repository_host_runner_from_mapping",
     "Entity", "Relation", "WorldGraph",
 ]
