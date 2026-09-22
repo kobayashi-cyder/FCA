@@ -45,6 +45,13 @@ from .repository_host_adapter import (
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
 from .structural_controller import StructuralCandidateController, StructuralCandidateEvaluation, StructuralMeasurement
+from .structural_candidate import (
+    StructuralCandidateFactory,
+    StructuralCandidateProposal,
+    StructuralCandidateRequest,
+    StructuralCandidateRun,
+    StructuralGenerationResult,
+)
 from .structural_gate import StructuralEvidence, StructuralImprovementGate
 from .teacher_priors import (
     FAPV78CircuitPriors,
@@ -71,6 +78,8 @@ __all__ = [
     "JSONGoalCheckpointStore", "ConnectomeManifest", "WiringUnit",
     "StructuralEvidence", "StructuralImprovementGate",
     "StructuralCandidateController", "StructuralCandidateEvaluation", "StructuralMeasurement",
+    "StructuralCandidateFactory", "StructuralCandidateProposal", "StructuralCandidateRequest",
+    "StructuralCandidateRun", "StructuralGenerationResult",
     "FAPV78CircuitPriors", "TeacherActivation", "TeacherAwareFCAAgent",
     "TeacherCircuit", "TeacherPriorError",
     "FCARebuiltRuntime", "IntegrityVerifier", "RuntimeStep",
