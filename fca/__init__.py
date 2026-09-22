@@ -25,6 +25,12 @@ from .rebuilt_runtime import (
     VerificationIssue,
     VerificationResult,
 )
+from .repository_generation import (
+    FCARepositoryGenerator,
+    RepositoryEditCandidate,
+    RepositoryGenerationError,
+    RepositoryGenerationResult,
+)
 from .repository_exchange import (
     RepositoryCodingEvidence,
     RepositoryEvidenceImporter,
@@ -94,6 +100,8 @@ __all__ = [
     "TeacherCircuit", "TeacherPriorError",
     "FCARebuiltRuntime", "IntegrityVerifier", "RuntimeStep",
     "VerificationIssue", "VerificationResult",
+    "FCARepositoryGenerator", "RepositoryEditCandidate",
+    "RepositoryGenerationError", "RepositoryGenerationResult",
     "RepositoryCodingEvidence", "RepositoryEvidenceImporter",
     "RepositoryExchangeReceipt", "RepositoryFileEvidence",
     "RepositoryCodingHostBinding", "RepositoryCodingHostResult",
