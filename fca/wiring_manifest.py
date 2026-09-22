@@ -13,6 +13,7 @@ class WiringUnit:
     unit_id: str
     inputs: tuple[int, ...]
     neuron_class: str = "KC"
+    regions: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -64,13 +65,21 @@ class ConnectomeManifest:
             uid = str(row.get("id", "")).strip()
             neuron_class = str(row.get("class", "KC")).strip() or "KC"
             inputs_raw = row.get("inputs")
+            regions_raw = row.get("regions", [])
             if not uid or uid in seen_ids or not isinstance(inputs_raw, list) or not inputs_raw:
                 raise ValueError("invalid or duplicate unit")
+            if not isinstance(regions_raw, list):
+                raise ValueError("unit regions must be a list")
             inputs = tuple(dict.fromkeys(int(i) for i in inputs_raw))
             if any(i < 0 or i >= channels for i in inputs):
                 raise ValueError("unit input is outside input_channels")
+            regions = tuple(dict.fromkeys(str(x).strip() for x in regions_raw))
+            if any(not region or len(region) > 256 for region in regions):
+                raise ValueError("unit region is empty or oversized")
+            if len(regions) > 512:
+                raise ValueError("unit has too many regions")
             seen_ids.add(uid)
-            units.append(WiringUnit(uid, inputs, neuron_class))
+            units.append(WiringUnit(uid, inputs, neuron_class, regions))
 
         canonical = json.dumps(raw, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
         digest = sha256(canonical).hexdigest()

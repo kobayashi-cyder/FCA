@@ -63,6 +63,8 @@ class FlyWireCodexImporterTests(unittest.TestCase):
             self.assertEqual(manifest.input_labels, ("p1", "p2"))
             self.assertEqual(manifest.wiring("KC"), ((0,), (1,)))
             self.assertEqual([u.unit_id for u in manifest.units], ["k1", "k2"])
+            self.assertEqual(manifest.units[0].regions, ("AL_R", "MB_R"))
+            self.assertEqual(manifest.units[1].regions, ("MB_R",))
             self.assertEqual(len(raw["source"]["connections_sha256"]), 64)
             self.assertEqual(len(raw["source"]["annotations_sha256"]), 64)
             self.assertEqual(len(raw["source"]["sha256"]), 64)
