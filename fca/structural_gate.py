@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 import re
 
 from .canary import CanaryObservation, StagedCanary
@@ -100,21 +101,34 @@ class StructuralImprovementGate:
         if key in self._evidence:
             return self.state
 
+        quality = float(evidence.quality_delta)
+        latency = float(evidence.latency_ratio)
+        memory = float(evidence.memory_ratio)
+        if (
+            not math.isfinite(quality)
+            or not math.isfinite(latency)
+            or not math.isfinite(memory)
+            or latency <= 0.0
+            or memory <= 0.0
+        ):
+            self.state = CandidateState.QUARANTINED
+            return self.state
+
         self._evidence[key] = StructuralEvidence(
             key=key,
             candidate_digest=digest,
             scope=scope,
             passed=bool(evidence.passed),
-            quality_delta=float(evidence.quality_delta),
-            latency_ratio=float(evidence.latency_ratio),
-            memory_ratio=float(evidence.memory_ratio),
+            quality_delta=quality,
+            latency_ratio=latency,
+            memory_ratio=memory,
         )
 
         if (
             not evidence.passed
-            or float(evidence.quality_delta) < self.min_quality_delta
-            or float(evidence.latency_ratio) > self.max_latency_ratio
-            or float(evidence.memory_ratio) > self.max_memory_ratio
+            or quality < self.min_quality_delta
+            or latency > self.max_latency_ratio
+            or memory > self.max_memory_ratio
         ):
             self.state = CandidateState.QUARANTINED
             return self.state
@@ -134,6 +148,13 @@ class StructuralImprovementGate:
             return "complete"
         if self.state != CandidateState.SHADOW:
             raise RuntimeError("candidate is not ready for canary rollout")
+        if (
+            not math.isfinite(float(observation.quality_delta))
+            or not math.isfinite(float(observation.latency_ratio))
+            or float(observation.latency_ratio) <= 0.0
+        ):
+            self.state = CandidateState.QUARANTINED
+            return "rollback"
 
         status = self._canary.add(observation)
         if status == "rollback":
