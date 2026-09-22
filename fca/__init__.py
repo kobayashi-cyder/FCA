@@ -24,6 +24,12 @@ from .rebuilt_runtime import (
     VerificationIssue,
     VerificationResult,
 )
+from .repository_exchange import (
+    RepositoryCodingEvidence,
+    RepositoryEvidenceImporter,
+    RepositoryExchangeReceipt,
+    RepositoryFileEvidence,
+)
 from .scheduler import OrganBid, ValueScheduler
 from .state_store import JSONGoalCheckpointStore
 from .teacher_priors import (
@@ -53,5 +59,7 @@ __all__ = [
     "TeacherCircuit", "TeacherPriorError",
     "FCARebuiltRuntime", "IntegrityVerifier", "RuntimeStep",
     "VerificationIssue", "VerificationResult",
+    "RepositoryCodingEvidence", "RepositoryEvidenceImporter",
+    "RepositoryExchangeReceipt", "RepositoryFileEvidence",
     "Entity", "Relation", "WorldGraph",
 ]
