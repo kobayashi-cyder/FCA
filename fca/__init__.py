@@ -3,6 +3,7 @@
 from .agent import FCAAgent, Decision
 from .autonomy import AutonomousLoop, GoalReport, Step
 from .canary import CanaryObservation, StagedCanary
+from .code_generation import CodeGenerationError, CodeGenerationResult, FCACodeGenerator, ProgramIR
 from .capability import CapabilityPriorityEngine, GapEvidence, GapKind
 from .concepts import ConceptGraph, Fact
 from .exchange import ExchangeCapsule
@@ -69,6 +70,7 @@ from .world_model import Entity, Relation, WorldGraph
 
 __all__ = [
     "FCAAgent", "Decision", "CanaryObservation", "StagedCanary",
+    "CodeGenerationError", "CodeGenerationResult", "FCACodeGenerator", "ProgramIR",
     "CapabilityPriorityEngine", "GapEvidence", "GapKind",
     "ConceptGraph", "Fact", "ExchangeCapsule", "ExchangeEvidence", "ExchangeRegistry", "ExchangeState",
     "GoalContract", "CriterionAssessment", "GoalAssessment", "GoalCritic",
