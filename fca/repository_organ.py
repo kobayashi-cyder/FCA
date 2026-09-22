@@ -71,10 +71,11 @@ class RepositoryCodingOrgan:
             raise ValueError("max_observation_chars must be in [256, 100000]")
         self.binding = binding
         self.registry = registry
+        self._capsule_digest = digest
         self.max_observation_chars = int(max_observation_chars)
 
     def __call__(self, goal: str, observation: str) -> OrganResult:
-        if not self.registry.allows(self.binding.capsule_digest, CAPABILITY):
+        if not self.registry.allows(self._capsule_digest, CAPABILITY):
             return OrganResult(
                 observation=observation,
                 reward=0.0,
@@ -140,7 +141,7 @@ class RepositoryCodingOrgan:
             return OrganResult(
                 observation=text,
                 reward=0.0,
-                progress=max(float(result.progress), 1.0),
+                progress=float(result.progress),
                 terminal=False,
                 blocked=False,
                 reason=(
