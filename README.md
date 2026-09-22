@@ -69,6 +69,30 @@ FCA also preserves established mechanisms outside the neural core:
 - FAP V78 procedural circuits as bounded connectome-native priors;
 - FAP V86 verified declarative skill composition outside the controller.
 
+## Bounded code generation
+
+FCA now includes a pure in-memory code-generation API derived from FAP's verified
+code path. It converts a natural-language request into a compact `ProgramIR`,
+emits Python source, and validates syntax plus a restrictive AST policy before
+returning the candidate.
+
+```python
+from fca import FCACodeGenerator
+
+generator = FCACodeGenerator()
+result = generator.generate(
+    "Pythonコードを作って。テキストから数字だけ抽出して合計する。"
+)
+
+assert result.ok
+print(result.source)
+print(result.ir.to_dict())
+```
+
+The generator does not write files, execute generated code, modify repositories,
+or promote candidates. Those actions remain outside the generator and preserve
+FCA's existing repository-coding approval boundary.
+
 ## Current execution shape
 
 ```text
