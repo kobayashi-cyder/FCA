@@ -142,7 +142,16 @@ class FCARepositoryGenerator:
             )
 
         filename = PurePosixPath(target).name
-        generated = self.code_generator.generate(goal, filename=filename)
+        try:
+            generated = self.code_generator.generate(goal, filename=filename)
+        except Exception as exc:
+            return self._rejected(
+                goal,
+                repository_digest,
+                target,
+                "program_generation_failed",
+                (type(exc).__name__,),
+            )
         if not generated.ok or generated.ir is None:
             return self._rejected(
                 goal,
