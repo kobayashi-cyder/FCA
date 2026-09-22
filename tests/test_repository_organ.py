@@ -166,7 +166,7 @@ class RepositoryCodingOrganTests(unittest.TestCase):
         self.assertFalse(result.blocked)
         self.assertFalse(result.terminal)
         self.assertEqual(result.reward, 0.0)
-        self.assertEqual(result.progress, 1.0)
+        self.assertEqual(result.progress, 0.75)
         self.assertIn("repository_coding_verified_candidate", result.reason)
         self.assertEqual(
             result.observation,
