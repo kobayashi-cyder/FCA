@@ -1,8 +1,8 @@
 # FCA — Fly Connectome Agent
 
-FCA is an independent project that rebuilds the useful engineering lessons from FAP around a **connectome-first core**.
+FCA is an independent project that rebuilds useful engineering lessons from FAP around a **connectome-first core**.
 
-FCA is not FAP renamed. FAP remains its own project. FCA treats the fly-inspired circuit as the primary computation model and attaches FAP-derived verification, memory, tooling and self-improvement controls around it.
+FCA is not FAP renamed. FAP remains its own project. FCA treats the fly-inspired circuit as the primary computation model and attaches verification, memory, tooling, world state and bounded acceleration around it.
 
 ## Core loop
 
@@ -17,9 +17,9 @@ global competition / inhibition
    ↓
 MBON-like action channels
    ↓
-action
+one selected organ/action
    ↓
-outcome / reward
+outcome + verification
    ↓
 dopamine-like prediction error
    ↓
@@ -27,7 +27,7 @@ local plasticity
    ↺
 ```
 
-The current implementation is intentionally small and deterministic:
+The executable neural core remains intentionally compact and deterministic:
 
 - bounded sensory hashing;
 - 256 KC-like sparse units;
@@ -37,11 +37,23 @@ The current implementation is intentionally small and deterministic:
 - action-value readout;
 - reward-prediction-error learning.
 
-This is **connectome-inspired engineering**, not a claim that the full Drosophila brain or its exact biological dynamics are simulated.
+This is **connectome-inspired engineering**, not a claim that the complete Drosophila brain is simulated.
 
-## FAP knowledge carried forward
+## v0.3 rebuild — lessons from FAP V87.34/V87.37/V87.39
 
-FCA preserves the strongest FAP ideas outside the neural core:
+The current rebuild keeps the neural controller unchanged and updates the runtime around it:
+
+- **lazy specialist organs** — registered as factories and constructed only after the connectome selects them;
+- **explicit WorldGraph** — typed entities, states, attributes, relations and negative relations;
+- **fail-closed execution verification** — results are checked before positive learning is accepted;
+- **verified hot paths** — optional native implementations are checked against the Python reference and fall back on mismatch/error;
+- **observable sparsity** — registered vs loaded organs and load counts are visible at runtime.
+
+The source lineage is documented in `docs/FAP_V87_39_REBUILD.md`.
+
+## Earlier FAP knowledge carried forward
+
+FCA also preserves established mechanisms outside the neural core:
 
 - sparse selective activation instead of always-on monolithic processing;
 - conversation / retrieval / verification / integration as replaceable organs;
@@ -49,24 +61,30 @@ FCA preserves the strongest FAP ideas outside the neural core:
 - hypothesis competition and parallel candidate search;
 - timeout and best-so-far behavior;
 - verified Failure Memory;
-- evidence gates;
-- duplicate-safe promotion evidence;
+- evidence gates and duplicate-safe promotion evidence;
 - `ephemeral -> shadow -> consolidated`;
-- regression quarantine;
-- canary rollout / rollback concepts;
+- regression quarantine and staged canary/rollback;
 - candidate provenance and holdout separation;
-- provider-neutral chat/image/audio/tool boundaries;
-- bounded resource use.
+- provider-neutral boundaries and bounded resource use;
+- FAP V78 procedural circuits as bounded connectome-native priors;
+- FAP V86 verified declarative skill composition outside the controller.
 
-See `docs/FAP_LINEAGE.md` and `docs/ARCHITECTURE.md`.
+## Current execution shape
 
-## Current status
+```text
+goal / observation
+  -> FCA sparse connectome
+  -> MBON action competition
+  -> LazyOrganRegistry loads exactly the selected specialist on first use
+  -> specialist outcome
+  -> IntegrityVerifier + optional critics
+  -> accepted: original reward
+     rejected: bounded negative teaching signal
+  -> WorldGraph records action/outcome/acceptance relation
+  -> MBON local plasticity
+```
 
-The current FCA mainline establishes the executable core, verified-improvement skeleton, and a connectome-native import of FAP V78's Gemma 4 distilled procedural circuits.
-
-The V78 import does **not** turn FCA into an LLM. The 10 distilled circuits are converted into bounded priors over existing MBON-like action channels *after* FCA computes its sparse KC pattern. Reward-prediction-error learning remains active, while 22 teacher memories stay explicitly shadow/unverified and 27 concept relations are imported as unverified facts.
-
-Run:
+Run the full regression suite:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -82,13 +100,13 @@ FCA currently does not claim:
 - verified image/STT/TTS backends;
 - GPT-5.6-class language quality.
 
-Those are capability targets to be measured, not assumed.
+Those are capability targets to measure, not assume.
 
 ## Development rule
 
-A feature only belongs in FCA main if it either:
+A feature belongs in FCA main only if it either:
 
 1. strengthens the connectome-centered agent loop, or
-2. is a bounded organ/control layer that supports that loop without replacing it with an unrelated monolithic architecture.
+2. is a bounded organ/control/acceleration layer that supports that loop without replacing it with an unrelated monolithic architecture.
 
 Material departures belong on a separately named experimental branch/project.

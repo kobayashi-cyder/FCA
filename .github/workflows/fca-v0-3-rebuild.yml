@@ -1,0 +1,36 @@
+name: FCA v0.3 rebuild verify
+
+on:
+  push:
+    branches:
+      - rebuild/fap-v87-39-connectome-runtime
+    paths:
+      - "fca/**"
+      - "tests/**"
+      - "docs/**"
+      - "pyproject.toml"
+      - "README.md"
+      - ".github/workflows/fca-v0-3-rebuild.yml"
+  pull_request:
+    paths:
+      - "fca/**"
+      - "tests/**"
+      - "docs/**"
+      - "pyproject.toml"
+      - "README.md"
+      - ".github/workflows/fca-v0-3-rebuild.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: python -m unittest discover -s tests -v

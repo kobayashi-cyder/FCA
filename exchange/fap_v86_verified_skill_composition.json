@@ -24,5 +24,5 @@
     "maximum 12 nodes; graph must be acyclic and every node must contribute to the output",
     "this bounded adaptation does not import FAP V86's autonomous invention or sparse-routing bridge"
   ],
-  "digest": "aeb854fec679560c32689417d43c628a0a01beeb53526cbdd5434ee4d363564c"
+  "digest": "910610ae5b9f532c6f34758325d5d152f5c0bbfe4a7fe8bccec5a16f319fe753"
 }
